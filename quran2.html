@@ -1,0 +1,2782 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran Vision</title>
+    <meta name="author" content="Yasin Ullah">
+    <meta name="description" content="Advanced, futuristic Quran web application for immersive reading, searching, listening, and note-taking.">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Nastaliq+Urdu:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --font-sans: 'Inter', sans-serif;
+            --font-arabic: 'Amiri', serif;
+            --font-urdu: 'Noto Nastaliq Urdu', serif;
+
+            --primary-hue: 210; /* Blue */
+            --secondary-hue: 260; /* Purple */
+            --accent-hue: 180; /* Teal/Cyan */
+
+            --text-color-primary: hsl(var(--primary-hue), 10%, 15%);
+            --text-color-secondary: hsl(var(--primary-hue), 10%, 35%);
+            --text-color-muted: hsl(var(--primary-hue), 10%, 55%);
+            
+            --bg-main: hsl(var(--primary-hue), 30%, 98%);
+            --bg-surface: hsl(0, 0%, 100%);
+            --bg-surface-alt: hsl(var(--primary-hue), 20%, 95%);
+            
+            --border-color-soft: hsl(var(--primary-hue), 20%, 90%);
+            --border-color-medium: hsl(var(--primary-hue), 15%, 80%);
+
+            --primary-color: hsl(var(--primary-hue), 70%, 50%);
+            --primary-color-dark: hsl(var(--primary-hue), 70%, 40%);
+            --primary-color-light: hsl(var(--primary-hue), 70%, 95%);
+
+            --accent-color: hsl(var(--accent-hue), 60%, 50%);
+            --accent-color-dark: hsl(var(--accent-hue), 60%, 40%);
+
+            --shadow-color: hsl(var(--primary-hue), 40%, 50%);
+            --shadow-xs: 0 1px 2px 0 rgba(var(--shadow-color), 0.03);
+            --shadow-sm: 0 2px 4px -1px rgba(var(--shadow-color), 0.04), 0 1px 3px 0 rgba(var(--shadow-color), 0.03);
+            --shadow-md: 0 4px 8px -2px rgba(var(--shadow-color), 0.05), 0 2px 4px -2px rgba(var(--shadow-color), 0.04);
+            --shadow-lg: 0 10px 15px -3px rgba(var(--shadow-color), 0.05), 0 4px 6px -4px rgba(var(--shadow-color), 0.05);
+
+            --font-size-arabic: 2.4rem;
+            --font-size-urdu: 1.6rem;
+            --font-size-english: 1rem;
+            --line-height-arabic: 2.6;
+            --line-height-translation: 1.9;
+
+            --border-radius: 8px;
+            --transition-speed: 0.2s;
+        }
+
+        [data-theme="dark"] {
+            --primary-hue: 210;
+            --secondary-hue: 260;
+            --accent-hue: 180;
+
+            --text-color-primary: hsl(var(--primary-hue), 15%, 90%);
+            --text-color-secondary: hsl(var(--primary-hue), 10%, 70%);
+            --text-color-muted: hsl(var(--primary-hue), 10%, 50%);
+
+            --bg-main: hsl(var(--primary-hue), 15%, 12%);
+            --bg-surface: hsl(var(--primary-hue), 15%, 18%);
+            --bg-surface-alt: hsl(var(--primary-hue), 15%, 22%);
+            
+            --border-color-soft: hsl(var(--primary-hue), 15%, 25%);
+            --border-color-medium: hsl(var(--primary-hue), 15%, 35%);
+
+            --primary-color: hsl(var(--primary-hue), 70%, 60%);
+            --primary-color-dark: hsl(var(--primary-hue), 70%, 50%);
+            --primary-color-light: hsl(var(--primary-hue), 70%, 20%);
+
+            --accent-color: hsl(var(--accent-hue), 60%, 60%);
+            --accent-color-dark: hsl(var(--accent-hue), 60%, 50%);
+            
+            --shadow-color: hsl(var(--primary-hue), 0%, 0%);
+        }
+        
+        [data-theme="green"] {
+            --primary-hue: 145; 
+            --secondary-hue: 160; 
+            --accent-hue: 100; 
+            --bg-main: hsl(var(--primary-hue), 30%, 96%);
+            --bg-surface: hsl(0, 0%, 100%);
+            --text-color-primary: hsl(var(--primary-hue), 40%, 20%);
+            --primary-color: hsl(var(--primary-hue), 50%, 45%);
+            --primary-color-dark: hsl(var(--primary-hue), 50%, 35%);
+            --primary-color-light: hsl(var(--primary-hue), 50%, 92%);
+        }
+        [data-theme="sepia"] {
+            --primary-hue: 35; 
+            --secondary-hue: 40;
+            --accent-hue: 45;
+            --bg-main: #f4e9d8;
+            --bg-surface: #fbf0e3;
+            --text-color-primary: #5b4636;
+            --text-color-secondary: #7d6c5a;
+            --border-color-soft: #e9dacb;
+            --primary-color: hsl(var(--primary-hue), 40%, 45%);
+            --primary-color-dark: hsl(var(--primary-hue), 40%, 35%);
+            --primary-color-light: hsl(var(--primary-hue), 40%, 90%);
+        }
+
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: 16px; scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-main);
+            color: var(--text-color-primary);
+            line-height: 1.65;
+            display: flex;
+            min-height: 100vh;
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        body.fullscreen-active { overflow: hidden; }
+
+        /* --- Layout --- */
+        .app-container { display: flex; width: 100%; }
+        .sidebar {
+            width: 300px;
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border-color-soft);
+            padding: 1.25rem;
+            overflow-y: auto;
+            height: 100vh;
+            position: fixed;
+            left: -300px;
+            top: 0;
+            z-index: 1100;
+            transition: left var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1), box-shadow var(--transition-speed) ease;
+            box-shadow: var(--shadow-lg);
+        }
+        .sidebar.open { left: 0; }
+        .main-content {
+            flex-grow: 1; display: flex; flex-direction: column;
+            height: 100vh; margin-left: 0;
+            transition: margin-left var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .app-container.sidebar-open .main-content { margin-left: 300px; }
+
+        header {
+            background-color: var(--bg-surface);
+            padding: 0.8rem 1.5rem;
+            box-shadow: var(--shadow-sm);
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border-color-soft);
+            min-height: 64px;
+            position: sticky; top: 0; z-index: 1000;
+        }
+        header h1 { font-size: 1.75rem; font-weight: 700; color: var(--primary-color); margin: 0; letter-spacing: -0.5px; }
+        .header-controls { display: flex; gap: 0.6rem; align-items: center; }
+
+        .btn {
+            padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 500;
+            border-radius: var(--border-radius); cursor: pointer;
+            border: 1px solid transparent; background-color: var(--primary-color); color: white;
+            transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            box-shadow: var(--shadow-xs);
+        }
+        .btn:hover { background-color: var(--primary-color-dark); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+        .btn:active { transform: translateY(0); box-shadow: var(--shadow-xs); }
+        .btn-secondary {
+            background-color: var(--bg-surface-alt); color: var(--text-color-secondary);
+            border-color: var(--border-color-medium);
+        }
+        .btn-secondary:hover { background-color: var(--border-color-soft); color: var(--text-color-primary); }
+        .btn svg { width: 1.1em; height: 1.1em; fill: currentColor; }
+        .btn.icon-only { padding: 0.5rem; }
+        .btn.icon-only span { display: none; }
+
+
+        .content-area { flex-grow: 1; overflow-y: auto; padding: 1.5rem; }
+        
+        .top-panel {
+            background-color: var(--bg-surface);
+            padding: 1rem; margin-bottom: 1.5rem;
+            border-radius: var(--border-radius); box-shadow: var(--shadow-md);
+        }
+        .top-panel .form-group { margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;}
+        .top-panel label { font-weight: 500; font-size: 0.9rem; color: var(--text-color-secondary); }
+        .top-panel input[type="number"], .top-panel input[type="text"], .top-panel select, .top-panel input[type="file"] {
+            padding: 0.5rem 0.75rem; border: 1px solid var(--border-color-medium); border-radius: calc(var(--border-radius) - 2px);
+            font-size: 0.9rem; background-color: var(--bg-main); color: var(--text-color-primary);
+            transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+        .top-panel input:focus, .top-panel select:focus {
+            outline: none; border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px hsla(var(--primary-hue), 70%, 50%, 0.2);
+        }
+        .top-panel input[type="number"] { width: 80px; }
+        .top-panel input[type="text"] { flex-grow: 1; min-width: 180px; }
+        .top-panel input[type="file"]::file-selector-button {
+            padding: 0.4rem 0.8rem; margin-right: 0.8rem;
+            border: 1px solid var(--primary-color); background-color: var(--primary-color-light); color: var(--primary-color);
+            border-radius: calc(var(--border-radius) - 4px); cursor: pointer; transition: background-color var(--transition-speed) ease;
+        }
+        .top-panel input[type="file"]::file-selector-button:hover { background-color: var(--primary-color); color: white; }
+
+
+        /* --- Sidebar Content --- */
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color-soft);}
+        .sidebar-header h2 { font-size: 1.4rem; font-weight: 600; margin: 0; color: var(--primary-color); }
+        .sidebar-tabs { display: flex; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color-soft); }
+        .sidebar-tab-btn {
+            flex: 1; padding: 0.75rem; text-align: center; cursor: pointer;
+            border: none; background: none; color: var(--text-color-muted); font-weight: 600; font-size: 0.9rem;
+            border-bottom: 3px solid transparent; transition: color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+        }
+        .sidebar-tab-btn.active, .sidebar-tab-btn:hover { color: var(--primary-color); }
+        .sidebar-tab-btn.active { border-bottom-color: var(--primary-color); }
+        .sidebar-tab-content { display: none; }
+        .sidebar-tab-content.active { display: block; }
+        .index-list { list-style: none; padding: 0; max-height: calc(100vh - 220px); overflow-y: auto;}
+        .index-list li a {
+            display: block; padding: 0.6rem 0.5rem; text-decoration: none;
+            color: var(--text-color-secondary); border-radius: calc(var(--border-radius) - 2px);
+            font-size: 0.95rem; font-weight: 500;
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+        }
+        .index-list li a:hover { background-color: var(--primary-color-light); color: var(--primary-color-dark); }
+        .index-list li a.active { background-color: var(--primary-color); color: white; font-weight: 600; }
+        .index-list li span { font-size: 0.85em; opacity: 0.8; margin-left: 0.5em; }
+        .index-list li .arabic-name { font-family: var(--font-arabic); font-size: 1.2em; margin-left: 0.5em;}
+
+
+        /* --- Reading Area --- */
+        .reading-area-main { direction: rtl; }
+        .reading-area-main.fullscreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1000; overflow-y: scroll; font-size: 1.1em;
+            background-color: var(--bg-surface); padding: 2rem;
+        }
+        .surah-header-info {
+            text-align: center; margin-bottom: 2rem; padding: 1.5rem;
+            background: linear-gradient(135deg, hsla(var(--primary-hue), 70%, 98%, 0.8), hsla(var(--accent-hue), 50%, 97%, 0.8));
+            border: 1px solid var(--border-color-soft);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+        }
+        [data-theme="dark"] .surah-header-info {
+             background: linear-gradient(135deg, hsla(var(--primary-hue), 20%, 22%, 0.8), hsla(var(--accent-hue), 20%, 20%, 0.8));
+        }
+        .surah-header-info h2 { font-family: var(--font-arabic); font-size: 3rem; color: var(--primary-color); margin:0; font-weight: 700;}
+        .surah-header-info p { font-size: 1rem; color: var(--text-color-secondary); margin: 0.3rem 0; direction: ltr;}
+
+
+        .ayah-display {
+            margin-bottom: 2rem; padding: 1.25rem 1.5rem;
+            border: 1px solid var(--border-color-soft); border-radius: var(--border-radius);
+            background-color: var(--bg-surface);
+            box-shadow: var(--shadow-md);
+            transition: border-color var(--transition-speed) ease, transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+        .ayah-display:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .ayah-display.active-playing-ayah {
+            border-left: 5px solid var(--accent-color);
+            box-shadow: 0 0 20px hsla(var(--accent-hue), 60%, 50%, 0.4);
+        }
+        body[dir="rtl"] .ayah-display.active-playing-ayah { border-right: 5px solid var(--accent-color); border-left: none;}
+
+
+        .ayah-meta-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; direction: ltr; }
+        .ayah-identifier { font-size: 1rem; color: var(--primary-color); font-weight: 600; }
+        .ayah-action-buttons { display: flex; gap: 0.5rem; }
+        .ayah-action-buttons button { font-size: 0.85rem; padding: 0.4rem 0.6rem; }
+
+        .arabic-text {
+            font-family: var(--font-arabic);
+            font-size: var(--font-size-arabic);
+            line-height: var(--line-height-arabic);
+            text-align: right; direction: rtl; margin-bottom: 1rem;
+            color: var(--text-color-primary);
+        }
+        .translation-block { margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px dashed var(--border-color-soft); }
+        .translation-label { font-size: 0.85rem; color: var(--text-color-muted); margin-bottom: 0.3rem; direction: ltr; font-weight: 500;}
+        .urdu-translation, .english-translation {
+            text-align: right; direction: rtl;
+            margin-bottom: 0.5rem; color: var(--text-color-secondary);
+        }
+        .urdu-translation { font-family: var(--font-urdu); font-size: var(--font-size-urdu); line-height: var(--line-height-translation); }
+        .english-translation { font-family: var(--font-sans); font-size: var(--font-size-english); line-height: var(--line-height-translation); text-align: left; direction: ltr;}
+
+        .ayah-notes-area { margin-top: 1.2rem; direction: ltr; }
+        .ayah-notes-area textarea {
+            width: 100%; min-height: 70px; padding: 0.75rem;
+            border: 1px solid var(--border-color-medium); border-radius: calc(var(--border-radius) - 2px);
+            font-family: var(--font-sans); font-size: 0.9rem;
+            background-color: var(--bg-main); color: var(--text-color-primary);
+            transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+        .ayah-notes-area textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px hsla(var(--primary-hue), 70%, 50%, 0.2); }
+        .ayah-notes-area button { margin-top: 0.5rem; }
+
+
+        /* --- Search & Suggestions --- */
+        .search-results-container { margin-top: 1.5rem; }
+        .search-results-container h3 { margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; color: var(--primary-color); direction: ltr; }
+        .search-results-content .ayah-display { font-size: 0.95em; margin-bottom: 1.5rem; }
+        .highlight { background-color: hsla(var(--accent-hue), 80%, 70%, 0.7); color: var(--text-color-primary); font-weight: 600; padding: 0.1em 0.2em; border-radius: 3px;}
+        [data-theme="dark"] .highlight { background-color: hsla(var(--accent-hue), 70%, 50%, 0.6); }
+        .suggestions-panel { margin-top: 0.8rem; font-size: 0.9rem; direction: ltr; padding: 0.75rem; background-color: var(--bg-surface-alt); border-radius: var(--border-radius); box-shadow: var(--shadow-sm);}
+        .suggestions-panel span { color: var(--primary-color); font-weight: 500; }
+        .suggestions-panel a { color: var(--primary-color-dark); text-decoration: none; cursor: pointer; margin-right: 0.75rem; padding: 0.2rem 0.4rem; border-radius: 4px; transition: background-color var(--transition-speed) ease;}
+        .suggestions-panel a:hover { background-color: var(--primary-color-light); text-decoration: underline; }
+
+        /* --- Modal (Futuristic - Glassmorphism attempt) --- */
+        .modal {
+            display: none; position: fixed; z-index: 1050;
+            left: 0; top: 0; width: 100%; height: 100%;
+            overflow: auto; background-color: hsla(0, 0%, 0%, 0.4); /* Darker overlay */
+            backdrop-filter: blur(8px); /* Glassmorphism effect */
+            -webkit-backdrop-filter: blur(8px);
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+        .modal.open { display: flex; align-items: center; justify-content: center; opacity: 1; }
+        .modal-content {
+            background-color: hsla(var(--primary-hue), 20%, 98%, 0.9); /* Semi-transparent surface */
+            [data-theme="dark"] & { background-color: hsla(var(--primary-hue), 15%, 15%, 0.9); }
+            padding: 1.5rem 2rem; border-radius: calc(var(--border-radius) + 4px);
+            box-shadow: var(--shadow-lg), 0 0 60px hsla(var(--primary-hue), 50%, 50%, 0.15);
+            border: 1px solid hsla(0, 0%, 100%, 0.15);
+            width: 90%; max-width: 550px;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal.open .modal-content { transform: scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color-soft);}
+        .modal-header h2 { margin: 0; font-size: 1.5rem; font-weight: 600; color: var(--primary-color); }
+        .modal-close-btn { font-size: 1.8rem; cursor: pointer; border:none; background:none; color: var(--text-color-muted); transition: color var(--transition-speed) ease; }
+        .modal-close-btn:hover { color: var(--primary-color); }
+        .modal-body .form-group { margin-bottom: 1.25rem; display: flex; flex-direction: column;}
+        .modal-body .form-group label { margin-bottom: 0.5rem; font-weight: 500; color: var(--text-color-secondary); }
+        .modal-body .form-group input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--primary-color); }
+        .modal-body .form-group select, .modal-body .form-group input[type="text"], .modal-body .form-group input[type="checkbox"] {
+            width: 100%; padding: 0.6rem 0.8rem;
+            border: 1px solid var(--border-color-medium);
+            border-radius: calc(var(--border-radius) - 2px);
+            background-color: var(--bg-main);
+        }
+        .modal-body .form-group input[type="checkbox"] { width: auto; margin-right: 0.5rem; transform: scale(1.1); accent-color: var(--primary-color);}
+        .modal-body .form-group small { font-size: 0.8em; color: var(--text-color-muted); margin-top: 0.3rem; }
+
+
+        #loadingIndicatorGlobal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: hsla(var(--primary-hue), 30%, 98%, 0.85);
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 2000; font-size: 1.2rem; color: var(--primary-color);
+            transition: opacity var(--transition-speed) ease;
+        }
+        [data-theme="dark"] #loadingIndicatorGlobal { background-color: hsla(var(--primary-hue), 15%, 12%, 0.85); }
+        #loadingIndicatorGlobal.hidden { opacity: 0; pointer-events: none; }
+
+        .loader-spinner {
+            border: 5px solid var(--border-color-soft);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 1.5rem;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .desktop-only { display: inline; }
+        /* Responsive */
+        @media (max-width: 992px) { 
+             .app-container.sidebar-open .main-content { margin-left: 0; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 280px; left: -280px; }
+            header h1 { font-size: 1.4rem; }
+            .header-controls .desktop-only { display: none; }
+            .header-controls .btn.icon-only { padding: 0.6rem; }
+            .top-panel input[type="text"] { min-width: 120px; }
+            :root {
+                --font-size-arabic: 2rem;
+                --font-size-urdu: 1.4rem;
+                --font-size-english: 0.95rem;
+            }
+            .content-area { padding: 1rem; }
+            .ayah-display { padding: 1rem; }
+            .modal-content { width: 95%; padding: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="loadingIndicatorGlobal" class="hidden">
+        <div class="loader-spinner"></div>
+        <p id="loadingText">Loading...</p>
+    </div>
+
+    <div class="app-container" id="appContainer">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Index</h2>
+                <button class="btn btn-secondary icon-only" id="closeSidebarBtn" title="Close Sidebar">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="sidebar-tabs">
+                <button class="sidebar-tab-btn active" data-tab="surahListTab">Surahs</button>
+                <button class="sidebar-tab-btn" data-tab="juzListTab">Juz</button>
+                <button class="sidebar-tab-btn" data-tab="bookmarksTab">Bookmarks</button>
+            </div>
+            <div id="surahListTab" class="sidebar-tab-content active">
+                <ul class="index-list" id="surahIndexList"></ul>
+            </div>
+            <div id="juzListTab" class="sidebar-tab-content">
+                <ul class="index-list" id="juzIndexList"></ul>
+            </div>
+            <div id="bookmarksTab" class="sidebar-tab-content">
+                <ul class="index-list" id="bookmarksIndexList"></ul>
+            </div>
+        </aside>
+
+        <div class="main-content" id="mainContent">
+            <header>
+                <button class="btn btn-secondary" id="toggleSidebarBtn" title="Toggle Sidebar">
+                    <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+                    <span class="desktop-only">Index</span>
+                </button>
+                <h1>Quran Vision</h1>
+                <div class="header-controls">
+                    <button id="lastReadBtn" class="btn btn-secondary" title="Go to Last Read Ayah">
+                        <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z"/></svg>
+                        <span class="desktop-only">Last Read</span>
+                    </button>
+                    <button id="audioPlayerBtn" class="btn btn-secondary icon-only" title="Audio Controls">
+                        <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                    </button>
+                    <button id="settingsBtn" class="btn btn-secondary icon-only" title="Settings">
+                        <svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+                    </button>
+                    <button id="toggleFullscreenBtnApp" class="btn btn-secondary icon-only" title="Toggle Fullscreen Reading">
+                        <svg viewBox="0 0 24 24" id="fsIconOpen"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                        <svg viewBox="0 0 24 24" id="fsIconClose" class="hidden"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+                    </button>
+                </div>
+            </header>
+
+            <div class="content-area" id="contentArea">
+                <div class="top-panel">
+                     <div class="form-group">
+                        <label for="translationFileLoad">Load Additional Translation (e.g., English):</label>
+                        <input type="file" id="translationFileLoad" accept=".txt,.json" style="flex-grow:1;">
+                         <small>Format: One line per Ayah (S_A: Text)</small>
+                    </div>
+                    <hr style="width:100%; margin: 1rem 0; border-color: var(--border-color-soft);">
+                    <div class="form-group">
+                        <label for="quickNavSurah">Surah:</label>
+                        <select id="quickNavSurah"></select>
+                        <label for="quickNavAyah">Ayah:</label>
+                        <input type="number" id="quickNavAyah" min="1" placeholder="Ayah">
+                        <button id="quickNavGoBtn" class="btn">Go</button>
+                    </div>
+                    <div class="form-group">
+                        <label for="mainSearchInput">Search:</label>
+                        <input type="text" id="mainSearchInput" placeholder="Search Arabic, Urdu, or Translation...">
+                        <button id="mainSearchBtn" class="btn">Search</button>
+                    </div>
+                    <div id="mainSuggestionsPanel" class="suggestions-panel hidden"></div>
+                </div>
+
+                <div id="initialMessage" style="text-align:center; padding: 2rem; font-size: 1.1rem; color: var(--text-color-secondary);">
+                    Loading Quran data... If this is the first time, it may take a moment.
+                </div>
+                
+                <div id="readingPane" class="reading-area-main hidden">
+                    <!-- Surah header and Ayahs will be rendered here -->
+                </div>
+                <div id="searchResultsPane" class="search-results-container hidden">
+                    <h3>Search Results</h3>
+                    <div class="search-results-content"></div>
+                </div>
+            </div> <!-- end content-area -->
+        </div> <!-- end main-content -->
+    </div> <!-- end app-container -->
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button id="closeSettingsModalBtn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="themeSelector">Theme:</label>
+                    <select id="themeSelector">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="green">Green</option>
+                        <option value="sepia">Sepia</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="arabicFontSize">Arabic Font Size: <span id="arabicFontSizeValue">2.4</span>rem</label>
+                    <input type="range" id="arabicFontSize" min="1.5" max="4.5" step="0.1" value="2.4">
+                </div>
+                <div class="form-group">
+                    <label for="urduFontSize">Urdu Font Size: <span id="urduFontSizeValue">1.6</span>rem</label>
+                    <input type="range" id="urduFontSize" min="1.0" max="3.5" step="0.1" value="1.6">
+                </div>
+                <div class="form-group">
+                    <label for="englishFontSize">Additional Translation Font Size: <span id="englishFontSizeValue">1</span>rem</label>
+                    <input type="range" id="englishFontSize" min="0.8" max="2.5" step="0.1" value="1">
+                </div>
+                <div class="form-group" style="flex-direction: row; align-items: center;">
+                    <input type="checkbox" id="showUrduTranslationToggle" checked style="width:auto;">
+                    <label for="showUrduTranslationToggle" style="margin-bottom:0;">Show Urdu Translation</label>
+                </div>
+                <div class="form-group" style="flex-direction: row; align-items: center;">
+                     <input type="checkbox" id="showEnglishTranslationToggle" checked style="width:auto;">
+                    <label for="showEnglishTranslationToggle" style="margin-bottom:0;">Show Additional Translation</label>
+                </div>
+                 <div class="form-group">
+                    <label for="reciterSelect">Reciter (for everyayah.com):</label>
+                    <select id="reciterSelect">
+                        <option value="Alafasy_128kbps">Mishary Rashid Alafasy (128kbps)</option>
+                        <option value="Abdurrahmaan_As-Sudais_192kbps">Abdurrahman As-Sudais (192kbps)</option>
+                        <option value="Ghamadi_40kbps">Saad Al Ghamadi (40kbps)</option>
+                        <option value="Hudhaify_128kbps">Ali Al-Hudhaify (128kbps)</option>
+                        <option value="Minshawi_Murattal_128kbps">Mohamed Siddiq El-Minshawi (Murattal 128kbps)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="audioPlaybackRate">Audio Playback Rate: <span id="audioPlaybackRateValue">1</span>x</label>
+                    <input type="range" id="audioPlaybackRate" min="0.5" max="2" step="0.1" value="1">
+                </div>
+                <small>Audio uses everyayah.com and requires an internet connection.</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Player Controls Modal -->
+    <div id="audioControlsModal" class="modal">
+        <div class="modal-content" style="max-width:380px;">
+             <div class="modal-header">
+                <h2>Audio Player</h2>
+                <button id="closeAudioControlsModalBtn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body" style="text-align:center;">
+                <p id="currentPlayingAyahInfo" style="font-weight:500; margin-bottom:1rem;">Ayah: -</p>
+                <audio id="ayahAudioPlayer" style="width:100%; margin-bottom:1rem;" controls></audio>
+                <div style="display:flex; justify-content:space-around; margin-bottom:1rem;">
+                    <button id="audioPrevBtn" class="btn btn-secondary icon-only" title="Previous Ayah">
+                        <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                    </button>
+                    <button id="audioPlayPauseBtn" class="btn" style="padding: 0.6rem 1.2rem;">
+                        <svg viewBox="0 0 24 24" style="width:1.2em; height:1.2em; margin-right:0.3em;"><path d="M8 5v14l11-7z"/></svg> Play
+                    </button>
+                    <button id="audioNextBtn" class="btn btn-secondary icon-only" title="Next Ayah">
+                        <svg viewBox="0 0 24 24"><path d="M16 6l-8.5 6 8.5 6V6zm-2 12h2V6h-2v12z"/></svg>
+                    </button>
+                </div>
+                <div class="form-group" style="flex-direction: row; align-items: center; justify-content: center;">
+                    <input type="checkbox" id="continuousPlayToggle" checked style="width:auto;">
+                    <label for="continuousPlayToggle" style="margin-bottom:0;">Continuous Play</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+    // --- Quran Vision ---
+    // Author: Yasin Ullah
+    // Version: 3.1 - Debugging & UI Population Fixes
+
+    console.log("[DEBUG] Script execution started.");
+
+    // --- Constants & Global State ---
+    const APP_NAME = "QuranVision";
+    const LS_PREFIX = `${APP_NAME}_`;
+    const DB_NAME = `${APP_NAME}_DB`;
+    const DB_VERSION = 1; 
+    const QURAN_STORE_NAME = "quranAyahs";
+    const DATA_AM_PATH = "data.AM"; 
+    const DATA_VERSION_KEY = "dataVersion";
+    const CURRENT_DATA_VERSION = "1.0"; 
+
+    let db; 
+    let quranPrimaryData = []; 
+    let quranSecondaryTranslation = {};
+    let currentDisplay = { surah: 1, ayah: 1, mode: 'surah' };
+    let currentAudioAyah = null;
+    let isAudioPlaying = false;
+
+    // --- Surah & Juz Metadata ---
+    const fullSurahMeta = [ /* ... (Full list from previous response, 114 Surahs) ... */ 
+        { "id": 0, "name_en": "Select Surah", "name_ar": "اختر السورة", "num_ayahs": 0, "revelation_type": "" },
+        { "id": 1, "name_en": "Al-Fatiha", "name_ar": "الفاتحة", "num_ayahs": 7, "revelation_type": "Meccan" },
+        { "id": 2, "name_en": "Al-Baqarah", "name_ar": "البقرة", "num_ayahs": 286, "revelation_type": "Medinan" },
+        { "id": 3, "name_en": "Aal-Imran", "name_ar": "آل عمران", "num_ayahs": 200, "revelation_type": "Medinan" },
+        { "id": 4, "name_en": "An-Nisa", "name_ar": "النساء", "num_ayahs": 176, "revelation_type": "Medinan" },
+        { "id": 5, "name_en": "Al-Ma'idah", "name_ar": "المائدة", "num_ayahs": 120, "revelation_type": "Medinan" },
+        { "id": 6, "name_en": "Al-An'am", "name_ar": "الأنعام", "num_ayahs": 165, "revelation_type": "Meccan" },
+        { "id": 7, "name_en": "Al-A'raf", "name_ar": "الأعراف", "num_ayahs": 206, "revelation_type": "Meccan" },
+        { "id": 8, "name_en": "Al-Anfal", "name_ar": "الأنفال", "num_ayahs": 75, "revelation_type": "Medinan" },
+        { "id": 9, "name_en": "At-Tawbah", "name_ar": "التوبة", "num_ayahs": 129, "revelation_type": "Medinan" },
+        { "id": 10, "name_en": "Yunus", "name_ar": "يونس", "num_ayahs": 109, "revelation_type": "Meccan" },
+        { "id": 11, "name_en": "Hud", "name_ar": "هود", "num_ayahs": 123, "revelation_type": "Meccan" },
+        { "id": 12, "name_en": "Yusuf", "name_ar": "يوسف", "num_ayahs": 111, "revelation_type": "Meccan" },
+        { "id": 13, "name_en": "Ar-Ra'd", "name_ar": "الرعد", "num_ayahs": 43, "revelation_type": "Medinan" },
+        { "id": 14, "name_en": "Ibrahim", "name_ar": "إبراهيم", "num_ayahs": 52, "revelation_type": "Meccan" },
+        { "id": 15, "name_en": "Al-Hijr", "name_ar": "الحجر", "num_ayahs": 99, "revelation_type": "Meccan" },
+        { "id": 16, "name_en": "An-Nahl", "name_ar": "النحل", "num_ayahs": 128, "revelation_type": "Meccan" },
+        { "id": 17, "name_en": "Al-Isra", "name_ar": "الإسراء", "num_ayahs": 111, "revelation_type": "Meccan" },
+        { "id": 18, "name_en": "Al-Kahf", "name_ar": "الكهف", "num_ayahs": 110, "revelation_type": "Meccan" },
+        { "id": 19, "name_en": "Maryam", "name_ar": "مريم", "num_ayahs": 98, "revelation_type": "Meccan" },
+        { "id": 20, "name_en": "Taha", "name_ar": "طه", "num_ayahs": 135, "revelation_type": "Meccan" },
+        { "id": 21, "name_en": "Al-Anbiya", "name_ar": "الأنبياء", "num_ayahs": 112, "revelation_type": "Meccan" },
+        { "id": 22, "name_en": "Al-Hajj", "name_ar": "الحج", "num_ayahs": 78, "revelation_type": "Medinan" },
+        { "id": 23, "name_en": "Al-Mu'minun", "name_ar": "المؤمنون", "num_ayahs": 118, "revelation_type": "Meccan" },
+        { "id": 24, "name_en": "An-Nur", "name_ar": "النور", "num_ayahs": 64, "revelation_type": "Medinan" },
+        { "id": 25, "name_en": "Al-Furqan", "name_ar": "الفرقان", "num_ayahs": 77, "revelation_type": "Meccan" },
+        { "id": 26, "name_en": "Ash-Shu'ara", "name_ar": "الشعراء", "num_ayahs": 227, "revelation_type": "Meccan" },
+        { "id": 27, "name_en": "An-Naml", "name_ar": "النمل", "num_ayahs": 93, "revelation_type": "Meccan" },
+        { "id": 28, "name_en": "Al-Qasas", "name_ar": "القصص", "num_ayahs": 88, "revelation_type": "Meccan" },
+        { "id": 29, "name_en": "Al-Ankabut", "name_ar": "العنكبوت", "num_ayahs": 69, "revelation_type": "Meccan" },
+        { "id": 30, "name_en": "Ar-Rum", "name_ar": "الروم", "num_ayahs": 60, "revelation_type": "Meccan" },
+        { "id": 31, "name_en": "Luqman", "name_ar": "لقمان", "num_ayahs": 34, "revelation_type": "Meccan" },
+        { "id": 32, "name_en": "As-Sajdah", "name_ar": "السجدة", "num_ayahs": 30, "revelation_type": "Meccan" },
+        { "id": 33, "name_en": "Al-Ahzab", "name_ar": "الأحزاب", "num_ayahs": 73, "revelation_type": "Medinan" },
+        { "id": 34, "name_en": "Saba", "name_ar": "سبأ", "num_ayahs": 54, "revelation_type": "Meccan" },
+        { "id": 35, "name_en": "Fatir", "name_ar": "فاطر", "num_ayahs": 45, "revelation_type": "Meccan" },
+        { "id": 36, "name_en": "Ya-Sin", "name_ar": "يس", "num_ayahs": 83, "revelation_type": "Meccan" },
+        { "id": 37, "name_en": "As-Saffat", "name_ar": "الصافات", "num_ayahs": 182, "revelation_type": "Meccan" },
+        { "id": 38, "name_en": "Sad", "name_ar": "ص", "num_ayahs": 88, "revelation_type": "Meccan" },
+        { "id": 39, "name_en": "Az-Zumar", "name_ar": "الزمر", "num_ayahs": 75, "revelation_type": "Meccan" },
+        { "id": 40, "name_en": "Ghafir", "name_ar": "غافر", "num_ayahs": 85, "revelation_type": "Meccan" },
+        { "id": 41, "name_en": "Fussilat", "name_ar": "فصلت", "num_ayahs": 54, "revelation_type": "Meccan" },
+        { "id": 42, "name_en": "Ash-Shura", "name_ar": "الشورى", "num_ayahs": 53, "revelation_type": "Meccan" },
+        { "id": 43, "name_en": "Az-Zukhruf", "name_ar": "الزخرف", "num_ayahs": 89, "revelation_type": "Meccan" },
+        { "id": 44, "name_en": "Ad-Dukhan", "name_ar": "الدخان", "num_ayahs": 59, "revelation_type": "Meccan" },
+        { "id": 45, "name_en": "Al-Jathiyah", "name_ar": "الجاثية", "num_ayahs": 37, "revelation_type": "Meccan" },
+        { "id": 46, "name_en": "Al-Ahqaf", "name_ar": "الأحقاف", "num_ayahs": 35, "revelation_type": "Meccan" },
+        { "id": 47, "name_en": "Muhammad", "name_ar": "محمد", "num_ayahs": 38, "revelation_type": "Medinan" },
+        { "id": 48, "name_en": "Al-Fath", "name_ar": "الفتح", "num_ayahs": 29, "revelation_type": "Medinan" },
+        { "id": 49, "name_en": "Al-Hujurat", "name_ar": "الحجرات", "num_ayahs": 18, "revelation_type": "Medinan" },
+        { "id": 50, "name_en": "Qaf", "name_ar": "ق", "num_ayahs": 45, "revelation_type": "Meccan" },
+        { "id": 51, "name_en": "Adh-Dhariyat", "name_ar": "الذاريات", "num_ayahs": 60, "revelation_type": "Meccan" },
+        { "id": 52, "name_en": "At-Tur", "name_ar": "الطور", "num_ayahs": 49, "revelation_type": "Meccan" },
+        { "id": 53, "name_en": "An-Najm", "name_ar": "النجم", "num_ayahs": 62, "revelation_type": "Meccan" },
+        { "id": 54, "name_en": "Al-Qamar", "name_ar": "القمر", "num_ayahs": 55, "revelation_type": "Meccan" },
+        { "id": 55, "name_en": "Ar-Rahman", "name_ar": "الرحمن", "num_ayahs": 78, "revelation_type": "Medinan" },
+        { "id": 56, "name_en": "Al-Waqi'ah", "name_ar": "الواقعة", "num_ayahs": 96, "revelation_type": "Meccan" },
+        { "id": 57, "name_en": "Al-Hadid", "name_ar": "الحديد", "num_ayahs": 29, "revelation_type": "Medinan" },
+        { "id": 58, "name_en": "Al-Mujadila", "name_ar": "المجادلة", "num_ayahs": 22, "revelation_type": "Medinan" },
+        { "id": 59, "name_en": "Al-Hashr", "name_ar": "الحشر", "num_ayahs": 24, "revelation_type": "Medinan" },
+        { "id": 60, "name_en": "Al-Mumtahanah", "name_ar": "الممتحنة", "num_ayahs": 13, "revelation_type": "Medinan" },
+        { "id": 61, "name_en": "As-Saff", "name_ar": "الصف", "num_ayahs": 14, "revelation_type": "Medinan" },
+        { "id": 62, "name_en": "Al-Jumu'ah", "name_ar": "الجمعة", "num_ayahs": 11, "revelation_type": "Medinan" },
+        { "id": 63, "name_en": "Al-Munafiqun", "name_ar": "المنافقون", "num_ayahs": 11, "revelation_type": "Medinan" },
+        { "id": 64, "name_en": "At-Taghabun", "name_ar": "التغابن", "num_ayahs": 18, "revelation_type": "Medinan" },
+        { "id": 65, "name_en": "At-Talaq", "name_ar": "الطلاق", "num_ayahs": 12, "revelation_type": "Medinan" },
+        { "id": 66, "name_en": "At-Tahrim", "name_ar": "التحريم", "num_ayahs": 12, "revelation_type": "Medinan" },
+        { "id": 67, "name_en": "Al-Mulk", "name_ar": "الملك", "num_ayahs": 30, "revelation_type": "Meccan" },
+        { "id": 68, "name_en": "Al-Qalam", "name_ar": "القلم", "num_ayahs": 52, "revelation_type": "Meccan" },
+        { "id": 69, "name_en": "Al-Haqqah", "name_ar": "الحاقة", "num_ayahs": 52, "revelation_type": "Meccan" },
+        { "id": 70, "name_en": "Al-Ma'arij", "name_ar": "المعارج", "num_ayahs": 44, "revelation_type": "Meccan" },
+        { "id": 71, "name_en": "Nuh", "name_ar": "نوح", "num_ayahs": 28, "revelation_type": "Meccan" },
+        { "id": 72, "name_en": "Al-Jinn", "name_ar": "الجن", "num_ayahs": 28, "revelation_type": "Meccan" },
+        { "id": 73, "name_en": "Al-Muzzammil", "name_ar": "المزمل", "num_ayahs": 20, "revelation_type": "Meccan" },
+        { "id": 74, "name_en": "Al-Muddaththir", "name_ar": "المدثر", "num_ayahs": 56, "revelation_type": "Meccan" },
+        { "id": 75, "name_en": "Al-Qiyamah", "name_ar": "القيامة", "num_ayahs": 40, "revelation_type": "Meccan" },
+        { "id": 76, "name_en": "Al-Insan", "name_ar": "الإنسان", "num_ayahs": 31, "revelation_type": "Medinan" },
+        { "id": 77, "name_en": "Al-Mursalat", "name_ar": "المرسلات", "num_ayahs": 50, "revelation_type": "Meccan" },
+        { "id": 78, "name_en": "An-Naba", "name_ar": "النبأ", "num_ayahs": 40, "revelation_type": "Meccan" },
+        { "id": 79, "name_en": "An-Nazi'at", "name_ar": "النازعات", "num_ayahs": 46, "revelation_type": "Meccan" },
+        { "id": 80, "name_en": "Abasa", "name_ar": "عبس", "num_ayahs": 42, "revelation_type": "Meccan" },
+        { "id": 81, "name_en": "At-Takwir", "name_ar": "التكوير", "num_ayahs": 29, "revelation_type": "Meccan" },
+        { "id": 82, "name_en": "Al-Infitar", "name_ar": "الإنفطار", "num_ayahs": 19, "revelation_type": "Meccan" },
+        { "id": 83, "name_en": "Al-Mutaffifin", "name_ar": "المطففين", "num_ayahs": 36, "revelation_type": "Meccan" },
+        { "id": 84, "name_en": "Al-Inshiqaq", "name_ar": "الإنشقاق", "num_ayahs": 25, "revelation_type": "Meccan" },
+        { "id": 85, "name_en": "Al-Buruj", "name_ar": "البروج", "num_ayahs": 22, "revelation_type": "Meccan" },
+        { "id": 86, "name_en": "At-Tariq", "name_ar": "الطارق", "num_ayahs": 17, "revelation_type": "Meccan" },
+        { "id": 87, "name_en": "Al-A'la", "name_ar": "الأعلى", "num_ayahs": 19, "revelation_type": "Meccan" },
+        { "id": 88, "name_en": "Al-Ghashiyah", "name_ar": "الغاشية", "num_ayahs": 26, "revelation_type": "Meccan" },
+        { "id": 89, "name_en": "Al-Fajr", "name_ar": "الفجر", "num_ayahs": 30, "revelation_type": "Meccan" },
+        { "id": 90, "name_en": "Al-Balad", "name_ar": "البلد", "num_ayahs": 20, "revelation_type": "Meccan" },
+        { "id": 91, "name_en": "Ash-Shams", "name_ar": "الشمس", "num_ayahs": 15, "revelation_type": "Meccan" },
+        { "id": 92, "name_en": "Al-Layl", "name_ar": "الليل", "num_ayahs": 21, "revelation_type": "Meccan" },
+        { "id": 93, "name_en": "Ad-Duha", "name_ar": "الضحى", "num_ayahs": 11, "revelation_type": "Meccan" },
+        { "id": 94, "name_en": "Ash-Sharh", "name_ar": "الشرح", "num_ayahs": 8, "revelation_type": "Meccan" },
+        { "id": 95, "name_en": "At-Tin", "name_ar": "التين", "num_ayahs": 8, "revelation_type": "Meccan" },
+        { "id": 96, "name_en": "Al-Alaq", "name_ar": "العلق", "num_ayahs": 19, "revelation_type": "Meccan" },
+        { "id": 97, "name_en": "Al-Qadr", "name_ar": "القدر", "num_ayahs": 5, "revelation_type": "Meccan" },
+        { "id": 98, "name_en": "Al-Bayyinah", "name_ar": "البينة", "num_ayahs": 8, "revelation_type": "Medinan" },
+        { "id": 99, "name_en": "Az-Zalzalah", "name_ar": "الزلزلة", "num_ayahs": 8, "revelation_type": "Medinan" },
+        { "id": 100, "name_en": "Al-Adiyat", "name_ar": "العاديات", "num_ayahs": 11, "revelation_type": "Meccan" },
+        { "id": 101, "name_en": "Al-Qari'ah", "name_ar": "القارعة", "num_ayahs": 11, "revelation_type": "Meccan" },
+        { "id": 102, "name_en": "At-Takathur", "name_ar": "التكاثر", "num_ayahs": 8, "revelation_type": "Meccan" },
+        { "id": 103, "name_en": "Al-Asr", "name_ar": "العصر", "num_ayahs": 3, "revelation_type": "Meccan" },
+        { "id": 104, "name_en": "Al-Humazah", "name_ar": "الهمزة", "num_ayahs": 9, "revelation_type": "Meccan" },
+        { "id": 105, "name_en": "Al-Fil", "name_ar": "الفيل", "num_ayahs": 5, "revelation_type": "Meccan" },
+        { "id": 106, "name_en": "Quraysh", "name_ar": "قريش", "num_ayahs": 4, "revelation_type": "Meccan" },
+        { "id": 107, "name_en": "Al-Ma'un", "name_ar": "الماعون", "num_ayahs": 7, "revelation_type": "Meccan" },
+        { "id": 108, "name_en": "Al-Kawthar", "name_ar": "الكوثر", "num_ayahs": 3, "revelation_type": "Meccan" },
+        { "id": 109, "name_en": "Al-Kafirun", "name_ar": "الكافرون", "num_ayahs": 6, "revelation_type": "Meccan" },
+        { "id": 110, "name_en": "An-Nasr", "name_ar": "النصر", "num_ayahs": 3, "revelation_type": "Medinan" },
+        { "id": 111, "name_en": "Al-Masad", "name_ar": "المسد", "num_ayahs": 5, "revelation_type": "Meccan" },
+        { "id": 112, "name_en": "Al-Ikhlas", "name_ar": "الإخلاص", "num_ayahs": 4, "revelation_type": "Meccan" },
+        { "id": 113, "name_en": "Al-Falaq", "name_ar": "الفلق", "num_ayahs": 5, "revelation_type": "Meccan" },
+        { "id": 114, "name_en": "An-Nas", "name_ar": "الناس", "num_ayahs": 6, "revelation_type": "Meccan" }
+    ];
+    const juzStartAyahs = [ /* ... (Full list from previous response) ... */ 
+        { juz: 1, surah: 1, ayah: 1 }, { juz: 2, surah: 2, ayah: 142 }, { juz: 3, surah: 2, ayah: 253 },
+        { juz: 4, surah: 3, ayah: 93 }, { juz: 5, surah: 4, ayah: 24 }, { juz: 6, surah: 4, ayah: 148 },
+        { juz: 7, surah: 5, ayah: 82 }, { juz: 8, surah: 6, ayah: 111 }, { juz: 9, surah: 7, ayah: 88 },
+        { juz: 10, surah: 8, ayah: 41 }, { juz: 11, surah: 9, ayah: 93 }, { juz: 12, surah: 11, ayah: 6 },
+        { juz: 13, surah: 12, ayah: 53 }, { juz: 14, surah: 15, ayah: 1 }, { juz: 15, surah: 17, ayah: 1 },
+        { juz: 16, surah: 18, ayah: 75 }, { juz: 17, surah: 21, ayah: 1 }, { juz: 18, surah: 23, ayah: 1 },
+        { juz: 19, surah: 25, ayah: 21 }, { juz: 20, surah: 27, ayah: 56 }, { juz: 21, surah: 29, ayah: 46 },
+        { juz: 22, surah: 33, ayah: 31 }, { juz: 23, surah: 36, ayah: 28 }, { juz: 24, surah: 39, ayah: 32 },
+        { juz: 25, surah: 41, ayah: 47 }, { juz: 26, surah: 46, ayah: 1 }, { juz: 27, surah: 51, ayah: 31 },
+        { juz: 28, surah: 58, ayah: 1 }, { juz: 29, surah: 67, ayah: 1 }, { juz: 30, surah: 78, ayah: 1 }
+    ];
+
+    // --- DOM Elements ---
+    let El = {}; // Populated in initializeApp
+
+    // --- IndexedDB Setup ---
+    function initDB() {
+        console.log("[DEBUG] initDB called");
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onupgradeneeded = (event) => {
+                console.log("[DEBUG] IndexedDB onupgradeneeded");
+                db = event.target.result;
+                if (!db.objectStoreNames.contains(QURAN_STORE_NAME)) {
+                    const store = db.createObjectStore(QURAN_STORE_NAME, { keyPath: 'id' });
+                    store.createIndex('surahAyah', ['surahNumber', 'ayahNumber'], { unique: true });
+                    store.createIndex('surahNumber', 'surahNumber', { unique: false });
+                    console.log("[DEBUG] Quran store created.");
+                }
+                 if (!db.objectStoreNames.contains('appSettingsStore')) { // For DATA_VERSION_KEY
+                    db.createObjectStore('appSettingsStore', { keyPath: 'key' });
+                    console.log("[DEBUG] App settings store created.");
+                }
+            };
+            request.onsuccess = (event) => {
+                console.log("[DEBUG] IndexedDB opened successfully.");
+                db = event.target.result;
+                resolve(db);
+            };
+            request.onerror = (event) => {
+                console.error("[DEBUG] IndexedDB error:", event.target.error);
+                reject(event.target.error);
+            };
+        });
+    }
+    
+    async function getDBSetting(key) {
+        if (!db) { console.warn("[DEBUG] getDBSetting: DB not initialized."); return undefined; }
+        return new Promise((resolve) => {
+            try {
+                const transaction = db.transaction('appSettingsStore', 'readonly');
+                const store = transaction.objectStore('appSettingsStore');
+                const request = store.get(key);
+                request.onsuccess = () => resolve(request.result ? request.result.value : undefined);
+                request.onerror = (e) => { console.error(`[DEBUG] Error getting DB setting ${key}:`, e.target.error); resolve(undefined); };
+            } catch (e) {
+                console.error(`[DEBUG] Exception in getDBSetting for ${key}:`, e);
+                resolve(undefined);
+            }
+        });
+    }
+
+    async function setDBSetting(key, value) {
+        if (!db) { console.warn("[DEBUG] setDBSetting: DB not initialized."); return; }
+        return new Promise((resolve, reject) => {
+            try {
+                const transaction = db.transaction('appSettingsStore', 'readwrite');
+                const store = transaction.objectStore('appSettingsStore');
+                const request = store.put({ key, value });
+                request.onsuccess = resolve;
+                request.onerror = (e) => { console.error(`[DEBUG] Error setting DB setting ${key}:`, e.target.error); reject(e.target.error); };
+            } catch (e) {
+                console.error(`[DEBUG] Exception in setDBSetting for ${key}:`, e);
+                reject(e);
+            }
+        });
+    }
+
+    // --- Settings Manager ---
+    const SettingsManager = {
+        settings: {
+// Inside your MAIN script's SettingsManager.settings default object:
+// ... other settings ...
+tilawatModeActive: false, // Critical: default to false
+tilawatLastPosition: { surah: 1, ayah: 1, lineOffset: 0 },
+tilawatLinesPerPage: 15, // Or tilawatLinesPerChunk
+tilawatFontSize: 2.2,
+tilawatViewMode: 'paginated',
+            theme: 'light',
+            arabicFontSize: 2.4,
+            urduFontSize: 1.6,
+            englishFontSize: 1.0,
+            showUrdu: true,
+            showEnglish: true,
+            lastRead: { surah: 1, ayah: 1 },
+            reciter: 'Alafasy_128kbps',
+            audioPlaybackRate: 1,
+            continuousPlay: true,
+            bookmarks: [],
+            notes: {}
+        },
+        async load() {
+            console.log("[DEBUG] SettingsManager.load called");
+            const saved = localStorage.getItem(`${LS_PREFIX}settings`);
+            if (saved) {
+                try {
+                    this.settings = { ...this.settings, ...JSON.parse(saved) };
+                    console.log("[DEBUG] Loaded settings from localStorage:", this.settings);
+                } catch (e) {
+                    console.error("[DEBUG] Error parsing settings from localStorage:", e);
+                    // Fallback to defaults if parsing fails
+                }
+            }
+            this.applyAll();
+        },
+        save() {
+            console.log("[DEBUG] SettingsManager.save called");
+            localStorage.setItem(`${LS_PREFIX}settings`, JSON.stringify(this.settings));
+        },
+        update(key, value) {
+            console.log(`[DEBUG] SettingsManager.update: ${key} =`, value);
+            this.settings[key] = value;
+            this.save();
+            this.applySpecific(key, value);
+        },
+        applyAll() {
+            console.log("[DEBUG] SettingsManager.applyAll called");
+            Object.keys(this.settings).forEach(key => this.applySpecific(key, this.settings[key]));
+            UIManager.updateFontSizeDisplay();
+        },
+        applySpecific(key, value) {
+            // console.log(`[DEBUG] SettingsManager.applySpecific: ${key} =`, value);
+            const root = document.documentElement;
+            try {
+                switch (key) {
+                    case 'theme':
+                        document.body.setAttribute('data-theme', value);
+                        if(El.themeSelector) El.themeSelector.value = value;
+                        break;
+                    case 'arabicFontSize':
+                        root.style.setProperty('--font-size-arabic', `${value}rem`);
+                        if(El.arabicFontSize) El.arabicFontSize.value = value;
+                        break;
+                    case 'urduFontSize':
+                        root.style.setProperty('--font-size-urdu', `${value}rem`);
+                        if(El.urduFontSize) El.urduFontSize.value = value;
+                        break;
+                    case 'englishFontSize':
+                        root.style.setProperty('--font-size-english', `${value}rem`);
+                        if(El.englishFontSize) El.englishFontSize.value = value;
+                        break;
+                    case 'showUrdu': if(El.showUrduTranslationToggle) El.showUrduTranslationToggle.checked = value; break;
+                    case 'showEnglish': if(El.showEnglishTranslationToggle) El.showEnglishTranslationToggle.checked = value; break;
+                    case 'reciter': if(El.reciterSelect) El.reciterSelect.value = value; break;
+                    case 'audioPlaybackRate':
+                        if(El.ayahAudioPlayer) El.ayahAudioPlayer.playbackRate = value;
+                        if(El.audioPlaybackRate) El.audioPlaybackRate.value = value;
+                        break;
+                    case 'continuousPlay': if(El.continuousPlayToggle) El.continuousPlayToggle.checked = value; break;
+                }
+            } catch (e) {
+                console.error(`[DEBUG] Error applying setting ${key}:`, e, "Element:", El[key]);
+            }
+            if (['showUrdu', 'showEnglish'].includes(key) && quranPrimaryData.length > 0) {
+                NavigationManager.redisplayCurrentView();
+            }
+        },
+        get(key) { return this.settings[key]; }
+    };
+
+    // --- Data Manager ---
+    const DataManager = {
+        parsePrimaryDataLine(line) {
+            const tarjumaSeparator = " ترجمہ: ";
+            const metadataSeparator = "<br/>س ";
+            const tarjumaIndex = line.indexOf(tarjumaSeparator);
+            if (tarjumaIndex === -1) return null;
+            const arabicText = line.substring(0, tarjumaIndex).trim();
+            const restOfLine = line.substring(tarjumaIndex + tarjumaSeparator.length);
+            const metadataIndex = restOfLine.indexOf(metadataSeparator);
+            if (metadataIndex === -1) return null;
+            const urduTranslation = restOfLine.substring(0, metadataIndex).trim();
+            const metadataPart = restOfLine.substring(metadataIndex + metadataSeparator.length);
+            const ayahNumSeparator = " آ ";
+            const ayahNumIndex = metadataPart.indexOf(ayahNumSeparator);
+            if (ayahNumIndex === -1) return null;
+            const surahNumStr = metadataPart.substring(0, ayahNumIndex).trim();
+            const ayahNumStr = metadataPart.substring(ayahNumIndex + ayahNumSeparator.length).trim();
+            const surahNumber = parseInt(surahNumStr, 10);
+            const ayahNumber = parseInt(ayahNumStr, 10);
+
+            if (isNaN(surahNumber) || isNaN(ayahNumber) || surahNumber < 1 || surahNumber > 114 || ayahNumber < 1) return null;
+            
+            const surahInfo = fullSurahMeta[surahNumber] || { name_en: `Surah ${surahNumber}`, name_ar: `سورة ${surahNumber}` };
+            return {
+                id: `${surahNumber}_${ayahNumber}`,
+                surahNumber, ayahNumber, arabicText, urduTranslation,
+                surahNameEn: surahInfo.name_en,
+                surahNameAr: surahInfo.name_ar
+            };
+        },
+        async checkAndLoadInitialData() {
+            console.log("[DEBUG] DataManager.checkAndLoadInitialData called");
+            UIManager.showGlobalLoading("Checking Quran data...");
+            try {
+                const storedDataVersion = await getDBSetting(DATA_VERSION_KEY);
+                const count = await this.getAyahCountFromDB();
+                console.log(`[DEBUG] DB Ayah count: ${count}, Stored data version: ${storedDataVersion}, Current data version: ${CURRENT_DATA_VERSION}`);
+
+                if (count > 6000 && storedDataVersion === CURRENT_DATA_VERSION) {
+                    console.log("[DEBUG] Quran data found in IndexedDB and is current.");
+                    await this.loadDataFromDBIntoMemory();
+                } else {
+                    console.log("[DEBUG] Quran data not found, outdated, or incomplete. Fetching and storing...");
+                    UIManager.showGlobalLoading(`Fetching ${DATA_AM_PATH}...`);
+                    const response = await fetch(DATA_AM_PATH);
+                    if (!response.ok) throw new Error(`Failed to fetch ${DATA_AM_PATH}: ${response.statusText}`);
+                    const fileContent = await response.text();
+                    console.log("[DEBUG] data.AM fetched successfully.");
+                    
+                    UIManager.showGlobalLoading("Parsing and storing Quran data...");
+                    const lines = fileContent.split('\n');
+                    const parsedAyahs = [];
+                    lines.forEach(line => {
+                        if (line.trim() === "") return;
+                        const parsed = this.parsePrimaryDataLine(line);
+                        if (parsed) parsedAyahs.push(parsed);
+                    });
+
+                    if (parsedAyahs.length > 0) {
+                        await this.storeAyahsInDB(parsedAyahs, true);
+                        await setDBSetting(DATA_VERSION_KEY, CURRENT_DATA_VERSION);
+                        quranPrimaryData = parsedAyahs;
+                        console.log(`[DEBUG] Stored ${parsedAyahs.length} ayahs in IndexedDB.`);
+                    } else {
+                        throw new Error("No valid Ayahs found in the fetched data.AM file.");
+                    }
+                }
+
+                if (quranPrimaryData.length > 0) {
+                    console.log("[DEBUG] Quran data ready in memory. Populating UI.");
+                    El.initialMessage.classList.add('hidden');
+                    El.readingPane.classList.remove('hidden');
+                    UIManager.populateIndexLists(); // This includes quickNavSurah
+                    NavigationManager.goToSurah(SettingsManager.get('lastRead').surah, SettingsManager.get('lastRead').ayah, true);
+                } else {
+                    El.initialMessage.textContent = "Failed to load Quran data. Please ensure 'data.AM' is accessible and try refreshing.";
+                    El.initialMessage.style.color = 'red';
+                    console.error("[DEBUG] quranPrimaryData is empty after load attempt.");
+                }
+
+            } catch (error) {
+                console.error("[DEBUG] Error during initial data load:", error);
+                El.initialMessage.textContent = `Error: ${error.message}. Please check console and ensure 'data.AM' is in the same directory and accessible via fetch (try using a local server).`;
+                El.initialMessage.style.color = 'red';
+            } finally {
+                UIManager.hideGlobalLoading();
+            }
+        },
+        async storeAyahsInDB(ayahs, clearFirst = false) {
+            if (!db) throw new Error("DB not initialized for storing ayahs.");
+            console.log(`[DEBUG] Storing ${ayahs.length} ayahs in DB. Clear first: ${clearFirst}`);
+            const transaction = db.transaction(QURAN_STORE_NAME, 'readwrite');
+            const store = transaction.objectStore(QURAN_STORE_NAME);
+            
+            if (clearFirst) {
+                console.log("[DEBUG] Clearing existing ayahs from DB.");
+                await new Promise((resolve, reject) => {
+                    const req = store.clear();
+                    req.onsuccess = resolve;
+                    req.onerror = (e) => { console.error("[DEBUG] Error clearing store:", e.target.error); reject(req.error); };
+                });
+            }
+
+            let count = 0;
+            const total = ayahs.length;
+            for (const ayah of ayahs) {
+                store.put(ayah);
+                count++;
+                if (count % 500 === 0 || count === total) { // Update UI periodically
+                    UIManager.showGlobalLoading(`Storing Ayahs: ${count}/${total}`);
+                    console.log(`[DEBUG] Stored ${count}/${total} ayahs...`);
+                }
+            }
+            return new Promise((resolve, reject) => {
+                transaction.oncomplete = () => { console.log("[DEBUG] DB transaction complete for storing ayahs."); resolve(); };
+                transaction.onerror = (e) => { console.error("[DEBUG] DB transaction error for storing ayahs:", e.target.error); reject(transaction.error); };
+            });
+        },
+        async loadDataFromDBIntoMemory() {
+            if (!db) throw new Error("DB not initialized for loading data.");
+            console.log("[DEBUG] Loading data from DB into memory.");
+            UIManager.showGlobalLoading("Loading Quran data from local storage...");
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(QURAN_STORE_NAME, 'readonly');
+                const store = transaction.objectStore(QURAN_STORE_NAME);
+                const request = store.getAll();
+                request.onsuccess = () => {
+                    quranPrimaryData = request.result;
+                    console.log(`[DEBUG] Loaded ${quranPrimaryData.length} ayahs into memory from DB.`);
+                    resolve();
+                };
+                request.onerror = (e) => {
+                    console.error("[DEBUG] Error loading all ayahs from DB:", e.target.error);
+                    reject(request.error);
+                };
+            });
+        },
+        async getAyahCountFromDB() {
+            if (!db) { console.warn("[DEBUG] getAyahCountFromDB: DB not initialized."); return 0; }
+            return new Promise((resolve) => {
+                try {
+                    const transaction = db.transaction(QURAN_STORE_NAME, 'readonly');
+                    const store = transaction.objectStore(QURAN_STORE_NAME);
+                    const request = store.count();
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = (e) => { console.error("[DEBUG] Error counting ayahs in DB:", e.target.error); resolve(0); };
+                } catch (e) {
+                    console.error("[DEBUG] Exception in getAyahCountFromDB:", e);
+                    resolve(0);
+                }
+            });
+        },
+        async loadSecondaryTranslation(file) {
+            console.log("[DEBUG] DataManager.loadSecondaryTranslation called");
+            UIManager.showGlobalLoading("Parsing additional translation...");
+            quranSecondaryTranslation = {};
+            try {
+                const fileContent = await file.text();
+                const lines = fileContent.split('\n');
+                lines.forEach(line => {
+                    if (line.trim() === "") return;
+                    const parts = line.split(':'); 
+                    if (parts.length >= 2) {
+                        const key = parts[0].trim();
+                        const text = parts.slice(1).join(':').trim();
+                        if (key.match(/^\d+_\d+$/)) { 
+                           quranSecondaryTranslation[key] = text;
+                        }
+                    }
+                });
+                if (Object.keys(quranSecondaryTranslation).length > 0) {
+                    alert("Additional translation loaded successfully.");
+                    SettingsManager.update('showEnglish', true); 
+                    NavigationManager.redisplayCurrentView();
+                } else {
+                    alert("No valid translation entries found. Expected 'S_A:Text'.");
+                }
+            } catch (error) {
+                console.error("[DEBUG] Error loading secondary translation:", error);
+                alert("Error loading secondary translation file. Check console.");
+            } finally {
+                UIManager.hideGlobalLoading();
+            }
+        },
+        getAyahById(id) { return quranPrimaryData.find(a => a.id === id); },
+        getAyahsBySurah(surahNum) { return quranPrimaryData.filter(a => a.surahNumber === surahNum).sort((a,b) => a.ayahNumber - b.ayahNumber); },
+        getAyahsByJuz(juzNum) {
+            const start = juzStartAyahs.find(j => j.juz === juzNum);
+            if (!start) return [];
+            
+            let endSurah, endAyah;
+            if (juzNum < 30) {
+                const nextJuzStart = juzStartAyahs.find(j => j.juz === juzNum + 1);
+                if (nextJuzStart.ayah === 1) { 
+                    const prevSurahNum = nextJuzStart.surah - 1;
+                    const prevSurahInfo = fullSurahMeta[prevSurahNum];
+                    endSurah = prevSurahNum;
+                    endAyah = prevSurahInfo.num_ayahs;
+                } else {
+                    endSurah = nextJuzStart.surah;
+                    endAyah = nextJuzStart.ayah - 1;
+                }
+            } else { 
+                endSurah = 114;
+                endAyah = fullSurahMeta[114].num_ayahs;
+            }
+
+            return quranPrimaryData.filter(ayah => {
+                if (ayah.surahNumber > start.surah && ayah.surahNumber < endSurah) return true;
+                if (ayah.surahNumber === start.surah && ayah.ayahNumber >= start.ayah && (start.surah < endSurah || ayah.ayahNumber <= endAyah)) return true;
+                if (ayah.surahNumber === endSurah && ayah.ayahNumber <= endAyah && (endSurah > start.surah || ayah.ayahNumber >= start.ayah)) return true;
+                if (start.surah === endSurah && ayah.surahNumber === start.surah && ayah.ayahNumber >= start.ayah && ayah.ayahNumber <= endAyah) return true;
+                return false;
+            }).sort((a,b) => {
+                if (a.surahNumber === b.surahNumber) return a.ayahNumber - b.ayahNumber;
+                return a.surahNumber - b.surahNumber;
+            });
+        }
+    };
+
+    // --- UI Manager ---
+    const UIManager = {
+        init() {
+            console.log("[DEBUG] UIManager.init called");
+            this.bindEventListeners();
+            this.populateQuickNavSurah(); // Populate this early, even if data isn't loaded, so it's not empty
+        },
+        bindEventListeners() {
+            console.log("[DEBUG] UIManager: Attempting to bind event listeners...");
+            let boundCount = 0;
+            let missingCount = 0;
+
+            const tryBind = (element, event, handler, elementName) => {
+                if (element) {
+                    element.addEventListener(event, handler);
+                    boundCount++;
+                } else {
+                    console.warn(`[DEBUG] UIManager: Element '${elementName}' NOT FOUND for binding.`);
+                    missingCount++;
+                }
+            };
+            
+            const tryBindMultiple = (elementsNodeList, event, handler, elementNamePrefix) => {
+                if (elementsNodeList && elementsNodeList.length > 0) {
+                    elementsNodeList.forEach((el, index) => {
+                        if (el) {
+                            el.addEventListener(event, handler);
+                            boundCount++;
+                        } else {
+                            console.warn(`[DEBUG] UIManager: Element '${elementNamePrefix}[${index}]' NOT FOUND in NodeList.`);
+                            missingCount++;
+                        }
+                    });
+                } else {
+                     console.warn(`[DEBUG] UIManager: NodeList '${elementNamePrefix}' is empty or NOT FOUND.`);
+                     if (elementsNodeList) missingCount += elementsNodeList.length;
+                }
+            };
+
+            tryBind(El.toggleSidebarBtn, 'click', () => this.toggleSidebar(), 'toggleSidebarBtn');
+            tryBind(El.closeSidebarBtn, 'click', () => this.toggleSidebar(false), 'closeSidebarBtn');
+            tryBindMultiple(El.sidebarTabBtns, 'click', (e) => this.switchSidebarTab(e.target), 'sidebarTabBtns');
+            
+            tryBind(El.settingsBtn, 'click', () => this.toggleModal(El.settingsModal, true), 'settingsBtn');
+            tryBind(El.closeSettingsModalBtn, 'click', () => this.toggleModal(El.settingsModal, false), 'closeSettingsModalBtn');
+            tryBind(El.audioPlayerBtn, 'click', () => this.toggleModal(El.audioControlsModal, true), 'audioPlayerBtn');
+            tryBind(El.closeAudioControlsModalBtn, 'click', () => this.toggleModal(El.audioControlsModal, false), 'closeAudioControlsModalBtn');
+            
+            tryBind(El.themeSelector, 'change', (e) => SettingsManager.update('theme', e.target.value), 'themeSelector');
+            ['arabic', 'urdu', 'english'].forEach(lang => {
+                tryBind(El[`${lang}FontSize`], 'input', (e) => {
+                    SettingsManager.update(`${lang}FontSize`, parseFloat(e.target.value));
+                    this.updateFontSizeDisplay();
+                }, `${lang}FontSize`);
+            });
+            tryBind(El.showUrduTranslationToggle, 'change', (e) => SettingsManager.update('showUrdu', e.target.checked), 'showUrduTranslationToggle');
+            tryBind(El.showEnglishTranslationToggle, 'change', (e) => SettingsManager.update('showEnglish', e.target.checked), 'showEnglishTranslationToggle');
+            tryBind(El.reciterSelect, 'change', e => SettingsManager.update('reciter', e.target.value), 'reciterSelect');
+            tryBind(El.audioPlaybackRate, 'input', e => {
+                SettingsManager.update('audioPlaybackRate', parseFloat(e.target.value));
+                this.updateAudioRateDisplay();
+            }, 'audioPlaybackRate');
+            tryBind(El.continuousPlayToggle, 'change', e => SettingsManager.update('continuousPlay', e.target.checked), 'continuousPlayToggle');
+
+            tryBind(El.translationFileLoad, 'change', (e) => e.target.files.length && DataManager.loadSecondaryTranslation(e.target.files[0]), 'translationFileLoad');
+            
+            tryBind(El.quickNavGoBtn, 'click', NavigationManager.handleQuickNav, 'quickNavGoBtn');
+            tryBind(El.quickNavSurah, 'change', NavigationManager.updateQuickNavAyahMax, 'quickNavSurah');
+            tryBind(El.lastReadBtn, 'click', NavigationManager.goToLastRead, 'lastReadBtn');
+            
+            tryBind(El.mainSearchBtn, 'click', () => SearchManager.performSearch(), 'mainSearchBtn');
+            tryBind(El.mainSearchInput, 'keypress', (e) => e.key === 'Enter' && SearchManager.performSearch(), 'mainSearchInput');
+            
+            tryBind(El.toggleFullscreenBtnApp, 'click', () => this.toggleAppFullscreen(), 'toggleFullscreenBtnApp');
+            document.addEventListener('fullscreenchange', () => this.handleAppFullscreenChange()); // Global listener
+
+            tryBind(El.audioPlayPauseBtn, 'click', AudioManager.togglePlayPause, 'audioPlayPauseBtn');
+            tryBind(El.audioPrevBtn, 'click', AudioManager.playPrevious, 'audioPrevBtn');
+            tryBind(El.audioNextBtn, 'click', AudioManager.playNext, 'audioNextBtn');
+            tryBind(El.ayahAudioPlayer, 'ended', AudioManager.handleAudioEnded, 'ayahAudioPlayer_ended');
+            tryBind(El.ayahAudioPlayer, 'play', () => { El.audioPlayPauseBtn.innerHTML = `<svg viewBox="0 0 24 24" style="width:1.2em; height:1.2em; margin-right:0.3em;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg> Pause`; isAudioPlaying = true; }, 'ayahAudioPlayer_play');
+            tryBind(El.ayahAudioPlayer, 'pause', () => { El.audioPlayPauseBtn.innerHTML = `<svg viewBox="0 0 24 24" style="width:1.2em; height:1.2em; margin-right:0.3em;"><path d="M8 5v14l11-7z"/></svg> Play`; isAudioPlaying = false; }, 'ayahAudioPlayer_pause');
+
+            console.log(`[DEBUG] UIManager: Bound ${boundCount} listeners. Missing ${missingCount} elements.`);
+            if (missingCount > 0) {
+                console.error("[DEBUG] UIManager: CRITICAL - Some UI elements were not found. Associated buttons will not work.");
+            }
+        },
+        toggleSidebar(forceOpen) {
+            const isOpen = El.sidebar.classList.contains('open');
+            const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !isOpen;
+            El.sidebar.classList.toggle('open', shouldOpen);
+            El.appContainer.classList.toggle('sidebar-open', shouldOpen && window.innerWidth > 992);
+            console.log(`[DEBUG] Sidebar toggled. Is open: ${shouldOpen}`);
+        },
+        switchSidebarTab(targetBtn) {
+            console.log("[DEBUG] Switching sidebar tab to:", targetBtn.dataset.tab);
+            El.sidebarTabBtns.forEach(btn => btn.classList.remove('active'));
+            targetBtn.classList.add('active');
+            document.querySelectorAll('.sidebar-tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(targetBtn.dataset.tab).classList.add('active');
+        },
+        toggleModal(modalElement, forceOpen) {
+            if (!modalElement) { console.error("[DEBUG] toggleModal: modalElement is null"); return; }
+            const isOpen = modalElement.classList.contains('open');
+            const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !isOpen;
+            modalElement.classList.toggle('open', shouldOpen);
+            document.body.style.overflow = shouldOpen ? 'hidden' : '';
+            console.log(`[DEBUG] Modal toggled. Is open: ${shouldOpen}`, modalElement.id);
+        },
+        showGlobalLoading(text = "Loading...") {
+            if (El.loadingText) El.loadingText.textContent = text;
+            if (El.loadingIndicatorGlobal) El.loadingIndicatorGlobal.classList.remove('hidden');
+            console.log(`[DEBUG] Show loading: ${text}`);
+        },
+        hideGlobalLoading() {
+            if (El.loadingIndicatorGlobal) El.loadingIndicatorGlobal.classList.add('hidden');
+            console.log("[DEBUG] Hide loading");
+        },
+        populateIndexLists() {
+            console.log("[DEBUG] UIManager.populateIndexLists called");
+            // Surah List
+            El.surahIndexList.innerHTML = '';
+            fullSurahMeta.slice(1).forEach(s => { 
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = `#s${s.id}`;
+                a.dataset.surahId = s.id;
+                a.innerHTML = `${s.id}. ${s.name_en} <span class="arabic-name">${s.name_ar}</span><br><span style="font-size:0.8em; opacity:0.7;">(${s.num_ayahs} Ayahs, ${s.revelation_type})</span>`;
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    NavigationManager.goToSurah(s.id);
+                    if (window.innerWidth <= 768) this.toggleSidebar(false); 
+                });
+                li.appendChild(a);
+                El.surahIndexList.appendChild(li);
+            });
+            // Juz List
+            El.juzIndexList.innerHTML = '';
+            juzStartAyahs.forEach(j => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = `#j${j.juz}`;
+                a.dataset.juzId = j.juz;
+                const startSurahInfo = fullSurahMeta[j.surah];
+                a.innerHTML = `Juz ${j.juz} <br><span style="font-size:0.8em; opacity:0.7;">(Starts: ${startSurahInfo.name_en} ${j.surah}:${j.ayah})</span>`;
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    NavigationManager.goToJuz(j.juz);
+                    if (window.innerWidth <= 768) this.toggleSidebar(false);
+                });
+                li.appendChild(a);
+                El.juzIndexList.appendChild(li);
+            });
+            BookmarkManager.renderBookmarksIndexList();
+            this.populateQuickNavSurah(); // Ensure quick nav is also populated
+            console.log("[DEBUG] Index lists populated.");
+        },
+        populateQuickNavSurah() {
+            console.log("[DEBUG] UIManager.populateQuickNavSurah called");
+            if (!El.quickNavSurah) { console.error("[DEBUG] quickNavSurah element not found!"); return; }
+            El.quickNavSurah.innerHTML = ''; // Clear existing options
+            fullSurahMeta.forEach(s => {
+                const option = document.createElement('option');
+                option.value = s.id;
+                option.textContent = s.id > 0 ? `${s.id}. ${s.name_en}` : s.name_en; // Handle "Select Surah"
+                if (s.id === 0) option.disabled = true; // Disable "Select Surah"
+                El.quickNavSurah.appendChild(option);
+            });
+            // After populating, try to set its value if data is loaded
+            if (quranPrimaryData.length > 0) {
+                El.quickNavSurah.value = SettingsManager.get('lastRead').surah || "1";
+                NavigationManager.updateQuickNavAyahMax(); // Update Ayah dropdown based on this
+            } else {
+                 El.quickNavSurah.value = "0"; // "Select Surah"
+            }
+            console.log("[DEBUG] Quick Nav Surah populated. Current value:", El.quickNavSurah.value);
+        },
+        updateFontSizeDisplay() {
+            if(El.arabicFontSizeValue) El.arabicFontSizeValue.textContent = SettingsManager.get('arabicFontSize');
+            if(El.urduFontSizeValue) El.urduFontSizeValue.textContent = SettingsManager.get('urduFontSize');
+            if(El.englishFontSizeValue) El.englishFontSizeValue.textContent = SettingsManager.get('englishFontSize');
+        },
+        updateAudioRateDisplay() {
+            if(El.audioPlaybackRateValue) El.audioPlaybackRateValue.textContent = SettingsManager.get('audioPlaybackRate');
+        },
+        renderAyah(ayahData, query = null) {
+            const div = document.createElement('div');
+            div.className = 'ayah-display';
+            div.id = `ayah-${ayahData.id}`;
+            div.dataset.ayahId = ayahData.id;
+
+            let arabicHtml = ayahData.arabicText;
+            let urduHtml = ayahData.urduTranslation;
+            let englishText = quranSecondaryTranslation[ayahData.id] || "";
+            let englishHtml = englishText;
+
+            if (query) {
+                const regex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+                arabicHtml = arabicHtml.replace(regex, `<span class="highlight">$&</span>`);
+                if (SettingsManager.get('showUrdu')) urduHtml = urduHtml.replace(regex, `<span class="highlight">$&</span>`);
+                if (SettingsManager.get('showEnglish') && englishText) englishHtml = englishHtml.replace(regex, `<span class="highlight">$&</span>`);
+            }
+            
+            const isBookmarked = BookmarkManager.isBookmarked(ayahData.id);
+            const noteText = NotesManager.getNote(ayahData.id);
+
+            let translationsHTML = '';
+            if (SettingsManager.get('showUrdu') && ayahData.urduTranslation) {
+                translationsHTML += `<div class="translation-block"><p class="translation-label">Urdu Translation</p><p class="urdu-translation">${urduHtml}</p></div>`;
+            }
+            if (SettingsManager.get('showEnglish') && englishText) {
+                translationsHTML += `<div class="translation-block"><p class="translation-label">Additional Translation</p><p class="english-translation">${englishHtml}</p></div>`;
+            }
+
+            div.innerHTML = `
+                <div class="ayah-meta-controls">
+                    <span class="ayah-identifier">${ayahData.surahNumber}:${ayahData.ayahNumber}</span>
+                    <div class="ayah-action-buttons">
+                        <button class="btn btn-secondary icon-only play-ayah-btn" data-s="${ayahData.surahNumber}" data-a="${ayahData.ayahNumber}" title="Play Ayah">
+                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                        <button class="btn btn-secondary icon-only bookmark-ayah-btn" data-ayah-id="${ayahData.id}" title="${isBookmarked ? 'Unbookmark' : 'Bookmark'}">
+                            <svg viewBox="0 0 24 24">${isBookmarked ? '<path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>' : '<path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/>'}</svg>
+                        </button>
+                        <button class="btn btn-secondary icon-only notes-ayah-btn" data-ayah-id="${ayahData.id}" title="Add/Edit Note">
+                            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <p class="arabic-text">${arabicHtml}</p>
+                ${translationsHTML}
+                <div class="ayah-notes-area hidden" id="notes-area-${ayahData.id}">
+                    <textarea placeholder="Your notes for this Ayah...">${noteText}</textarea>
+                    <button class="btn btn-secondary save-note-btn" data-ayah-id="${ayahData.id}">Save Note</button>
+                </div>
+            `;
+            // Bind listeners for dynamically created buttons
+            const playBtn = div.querySelector('.play-ayah-btn');
+            if (playBtn) playBtn.addEventListener('click', AudioManager.handlePlayAyahBtn);
+            
+            const bookmarkBtn = div.querySelector('.bookmark-ayah-btn');
+            if (bookmarkBtn) bookmarkBtn.addEventListener('click', BookmarkManager.handleBookmarkBtn);
+
+            const notesBtn = div.querySelector('.notes-ayah-btn');
+            if (notesBtn) notesBtn.addEventListener('click', NotesManager.toggleNoteArea);
+            
+            const saveNoteBtn = div.querySelector('.save-note-btn');
+            if (saveNoteBtn) saveNoteBtn.addEventListener('click', NotesManager.handleSaveNoteBtn);
+            
+            return div;
+        },
+        displayContent(ayahs, mode, query = null, highlightId = null) {
+            console.log(`[DEBUG] UIManager.displayContent called. Mode: ${mode}, Ayahs count: ${ayahs.length}, Highlight ID: ${highlightId}`);
+            currentDisplay.mode = mode;
+            if (El.readingPane) El.readingPane.innerHTML = ''; 
+            if (El.searchResultsContent) El.searchResultsContent.innerHTML = '';
+
+            const targetPane = mode === 'search' ? El.searchResultsContent : El.readingPane;
+            const containerPane = mode === 'search' ? El.searchResultsPane : El.readingPane;
+            
+            if (!targetPane || !containerPane) {
+                console.error("[DEBUG] Target or container pane not found for displayContent.");
+                return;
+            }
+            
+            document.querySelectorAll('.page-section.active').forEach(s => s.classList.remove('active')); 
+            containerPane.classList.remove('hidden');
+
+            if (mode === 'surah' && ayahs.length > 0) {
+                if(El.searchResultsPane) El.searchResultsPane.classList.add('hidden');
+                const surahInfo = fullSurahMeta[ayahs[0].surahNumber];
+                const surahHeader = document.createElement('div');
+                surahHeader.className = 'surah-header-info';
+                surahHeader.innerHTML = `
+                    <h2>${surahInfo.name_ar}</h2>
+                    <p>${surahInfo.id}. ${surahInfo.name_en}</p>
+                    <p>${surahInfo.num_ayahs} Ayahs - ${surahInfo.revelation_type}</p>
+                `;
+                targetPane.appendChild(surahHeader);
+                if (ayahs[0].surahNumber !== 1 && ayahs[0].surahNumber !== 9 && ayahs[0].ayahNumber === 1) { 
+                    const bismillah = document.createElement('p');
+                    bismillah.className = 'arabic-text';
+                    bismillah.style.textAlign = 'center';
+                    bismillah.style.fontSize = `calc(${SettingsManager.get('arabicFontSize')}rem * 0.85)`; 
+                    bismillah.style.marginBottom = '1.5rem';
+                    bismillah.textContent = 'بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ';
+                    targetPane.appendChild(bismillah);
+                }
+            } else if (mode === 'search') {
+                if(El.readingPane) El.readingPane.classList.add('hidden');
+            }
+
+
+            if (ayahs.length === 0 && mode !== 'search') {
+                targetPane.innerHTML = `<p style="text-align:center; padding:2rem; color: var(--text-color-muted);">No Ayahs to display for this selection.</p>`;
+                return;
+            } else if (ayahs.length === 0 && mode === 'search') {
+                 targetPane.innerHTML = `<p style="text-align:center; padding:1rem; color: var(--text-color-muted);">No results found for "${query}".</p>`;
+            }
+
+            ayahs.forEach(ayah => targetPane.appendChild(this.renderAyah(ayah, query)));
+
+            if (highlightId) {
+                const el = document.getElementById(`ayah-${highlightId}`);
+                if (el) {
+                    setTimeout(() => {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        el.style.transition = 'background-color 0.5s ease';
+                        el.style.backgroundColor = 'var(--primary-color-light)';
+                        setTimeout(() => { el.style.backgroundColor = ''; }, 2500);
+                    }, 100);
+                } else {
+                    console.warn(`[DEBUG] Highlight element not found: ayah-${highlightId}`);
+                }
+            } else if (mode === 'surah' || mode === 'juz') {
+                targetPane.scrollTop = 0; 
+            }
+            console.log("[DEBUG] Content displayed.");
+        },
+        toggleAppFullscreen() {
+            console.log("[DEBUG] UIManager.toggleAppFullscreen called");
+            const mainReadingArea = El.readingPane.classList.contains('hidden') ? El.searchResultsPane : El.readingPane;
+            if (!document.fullscreenElement) {
+                if (mainReadingArea && mainReadingArea.requestFullscreen) {
+                    mainReadingArea.requestFullscreen().catch(err => {
+                        alert(`Error enabling full-screen: ${err.message}`);
+                    });
+                } else {
+                    console.error("[DEBUG] Fullscreen target area or requestFullscreen method not available.");
+                }
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        },
+        handleAppFullscreenChange() {
+            console.log("[DEBUG] UIManager.handleAppFullscreenChange called");
+            const isFs = !!document.fullscreenElement;
+            El.readingPane.classList.toggle('fullscreen', isFs && !El.readingPane.classList.contains('hidden'));
+            El.searchResultsPane.classList.toggle('fullscreen', isFs && !El.searchResultsPane.classList.contains('hidden'));
+            document.body.classList.toggle('fullscreen-active', isFs);
+            El.fsIconOpen.classList.toggle('hidden', isFs);
+            El.fsIconClose.classList.toggle('hidden', !isFs);
+        },
+        updateActiveAyahInSidebar(surahNum, ayahNum) {
+            console.log(`[DEBUG] UIManager.updateActiveAyahInSidebar: S${surahNum}:A${ayahNum}`);
+            document.querySelectorAll('#surahIndexList li a.active').forEach(el => el.classList.remove('active'));
+            const activeSurahLink = document.querySelector(`#surahIndexList li a[data-surah-id="${surahNum}"]`);
+            if (activeSurahLink) activeSurahLink.classList.add('active');
+        }
+    };
+
+    // --- Navigation Manager ---
+    const NavigationManager = {
+        handleQuickNav() {
+            console.log("[DEBUG] NavigationManager.handleQuickNav called");
+            const surah = parseInt(El.quickNavSurah.value);
+            const ayah = parseInt(El.quickNavAyah.value) || 1;
+            if (surah > 0) {
+                this.goToSurah(surah, ayah);
+            } else {
+                console.warn("[DEBUG] QuickNav: Invalid Surah selected.");
+            }
+        },
+        updateQuickNavAyahMax() {
+            console.log("[DEBUG] NavigationManager.updateQuickNavAyahMax called");
+            if (!El.quickNavSurah || !El.quickNavAyah) {
+                console.error("[DEBUG] QuickNav Surah or Ayah select element not found.");
+                return;
+            }
+            const surahNum = parseInt(El.quickNavSurah.value);
+            if (surahNum > 0 && fullSurahMeta[surahNum]) {
+                El.quickNavAyah.max = fullSurahMeta[surahNum].num_ayahs;
+                El.quickNavAyah.placeholder = `1-${fullSurahMeta[surahNum].num_ayahs}`;
+            } else {
+                El.quickNavAyah.max = 300; 
+                El.quickNavAyah.placeholder = `Ayah`;
+            }
+            El.quickNavAyah.value = ''; 
+            console.log(`[DEBUG] QuickNav Ayah max updated for Surah ${surahNum}. Max: ${El.quickNavAyah.max}`);
+        },
+        goToSurah(surahNum, ayahNum = 1, isInitialLoad = false) {
+            console.log(`[DEBUG] NavigationManager.goToSurah: S${surahNum}:A${ayahNum}, Initial: ${isInitialLoad}`);
+            if (quranPrimaryData.length === 0 && !isInitialLoad) {
+                alert("Quran data is not loaded yet. Please wait or check console for errors."); return;
+            }
+            const ayahs = DataManager.getAyahsBySurah(surahNum);
+            currentDisplay = { surah: surahNum, ayah: ayahNum, mode: 'surah' };
+            UIManager.displayContent(ayahs, 'surah', null, `${surahNum}_${ayahNum}`);
+            SettingsManager.update('lastRead', { surah: surahNum, ayah: ayahNum });
+            if (El.quickNavSurah) El.quickNavSurah.value = surahNum;
+            this.updateQuickNavAyahMax(); // Call this AFTER setting surah value
+            if (El.quickNavAyah) El.quickNavAyah.value = ayahNum;
+            UIManager.updateActiveAyahInSidebar(surahNum, ayahNum);
+        },
+        goToJuz(juzNum) {
+            console.log(`[DEBUG] NavigationManager.goToJuz: Juz ${juzNum}`);
+            if (quranPrimaryData.length === 0) { alert("Quran data is not loaded yet."); return; }
+            const ayahs = DataManager.getAyahsByJuz(juzNum);
+            if (ayahs.length > 0) {
+                const firstAyahOfJuz = ayahs[0];
+                currentDisplay = { surah: firstAyahOfJuz.surahNumber, ayah: firstAyahOfJuz.ayahNumber, mode: 'juz', juz: juzNum };
+                UIManager.displayContent(ayahs, 'juz', null, firstAyahOfJuz.id);
+                SettingsManager.update('lastRead', { surah: firstAyahOfJuz.surahNumber, ayah: firstAyahOfJuz.ayahNumber });
+                if (El.quickNavSurah) El.quickNavSurah.value = firstAyahOfJuz.surahNumber;
+                this.updateQuickNavAyahMax();
+                if (El.quickNavAyah) El.quickNavAyah.value = firstAyahOfJuz.ayahNumber;
+                UIManager.updateActiveAyahInSidebar(firstAyahOfJuz.surahNumber, firstAyahOfJuz.ayahNumber);
+            } else {
+                console.warn(`[DEBUG] No ayahs found for Juz ${juzNum}`);
+            }
+        },
+        goToLastRead() {
+            console.log("[DEBUG] NavigationManager.goToLastRead called");
+            const lastRead = SettingsManager.get('lastRead');
+            this.goToSurah(lastRead.surah, lastRead.ayah);
+        },
+        redisplayCurrentView() {
+            console.log("[DEBUG] NavigationManager.redisplayCurrentView called. Current mode:", currentDisplay.mode);
+            if (quranPrimaryData.length === 0) {
+                console.warn("[DEBUG] Cannot redisplay, Quran data not loaded.");
+                return;
+            }
+            if (currentDisplay.mode === 'surah') {
+                this.goToSurah(currentDisplay.surah, currentDisplay.ayah);
+            } else if (currentDisplay.mode === 'juz' && currentDisplay.juz) {
+                this.goToJuz(currentDisplay.juz);
+            } else if (currentDisplay.mode === 'search') {
+                SearchManager.performSearch(El.mainSearchInput.value.trim(), true); 
+            } else { 
+                this.goToSurah(SettingsManager.get('lastRead').surah, SettingsManager.get('lastRead').ayah);
+            }
+        },
+        getNextAyah(currentSurah, currentAyah) {
+            const currentAyahIndex = quranPrimaryData.findIndex(a => a.surahNumber === currentSurah && a.ayahNumber === currentAyah);
+            if (currentAyahIndex > -1 && currentAyahIndex < quranPrimaryData.length - 1) {
+                return quranPrimaryData[currentAyahIndex + 1];
+            }
+            return null; 
+        },
+        getPreviousAyah(currentSurah, currentAyah) {
+            const currentAyahIndex = quranPrimaryData.findIndex(a => a.surahNumber === currentSurah && a.ayahNumber === currentAyah);
+            if (currentAyahIndex > 0) {
+                return quranPrimaryData[currentAyahIndex - 1];
+            }
+            return null; 
+        }
+    };
+    const SearchManager = { /* ... (same as before) ... */
+        levenshteinDistance(a, b) { 
+            if (a.length === 0) return b.length;
+            if (b.length === 0) return a.length;
+            const matrix = [];
+            for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+            for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+            for (let i = 1; i <= b.length; i++) {
+                for (let j = 1; j <= a.length; j++) {
+                    if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                        matrix[i][j] = matrix[i - 1][j - 1];
+                    } else {
+                        matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
+                    }
+                }
+            }
+            return matrix[b.length][a.length];
+        },
+        performSearch(queryOverride = null, isRedisplay = false) {
+            console.log("[DEBUG] SearchManager.performSearch called");
+            const query = queryOverride !== null ? queryOverride : El.mainSearchInput.value.trim();
+            if (!isRedisplay && query.length < 2) { alert("Please enter at least 2 characters."); return; }
+            if (quranPrimaryData.length === 0) { alert("Quran data is not loaded yet."); return; }
+
+            const normalizedQuery = query.toLowerCase();
+            const results = [];
+            const potentialSuggestions = new Set();
+
+            quranPrimaryData.forEach(ayah => {
+                let matchFound = false;
+                if (ayah.arabicText.includes(query) || ayah.arabicText.toLowerCase().includes(normalizedQuery)) {
+                    matchFound = true;
+                }
+                if (SettingsManager.get('showUrdu') && (ayah.urduTranslation.includes(query) || ayah.urduTranslation.toLowerCase().includes(normalizedQuery))) {
+                    matchFound = true;
+                }
+                const englishText = quranSecondaryTranslation[ayah.id];
+                if (SettingsManager.get('showEnglish') && englishText && (englishText.includes(query) || englishText.toLowerCase().includes(normalizedQuery))) {
+                    matchFound = true;
+                }
+
+                if (matchFound) {
+                    results.push(ayah);
+                } else if (query.length > 3) { 
+                    const queryWords = normalizedQuery.split(/\s+/);
+                    const textsToSearch = [ayah.arabicText.toLowerCase()];
+                    if(SettingsManager.get('showUrdu')) textsToSearch.push(ayah.urduTranslation.toLowerCase());
+                    if(SettingsManager.get('showEnglish') && englishText) textsToSearch.push(englishText.toLowerCase());
+
+                    for(const text of textsToSearch) {
+                        const textWords = text.split(/\s+/);
+                        for (const qw of queryWords) {
+                            if (qw.length < 3) continue;
+                            for (const tw of textWords) {
+                                if (this.levenshteinDistance(qw, tw) <= Math.floor(qw.length / 3.5)) { 
+                                    potentialSuggestions.add(tw.length > qw.length ? tw : qw); 
+                                    break; 
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            currentDisplay.mode = 'search'; 
+            UIManager.displayContent(results, 'search', query);
+
+            El.mainSuggestionsPanel.innerHTML = '';
+            if (results.length === 0 && potentialSuggestions.size > 0) {
+                El.mainSuggestionsPanel.classList.remove('hidden');
+                let suggestionsHTML = '<span>Did you mean: </span>';
+                Array.from(potentialSuggestions).slice(0, 5).forEach(sug => {
+                    suggestionsHTML += `<a class="suggestion-link">${sug}</a> `;
+                });
+                El.mainSuggestionsPanel.innerHTML = suggestionsHTML;
+                El.mainSuggestionsPanel.querySelectorAll('.suggestion-link').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        El.mainSearchInput.value = e.target.textContent;
+                        this.performSearch();
+                    });
+                });
+            } else {
+                El.mainSuggestionsPanel.classList.add('hidden');
+            }
+        }
+    };
+    const BookmarkManager = { /* ... (same as before) ... */
+        load() { SettingsManager.get('bookmarks'); },
+        save() { SettingsManager.update('bookmarks', SettingsManager.get('bookmarks')); },
+        isBookmarked(ayahId) { return SettingsManager.get('bookmarks').includes(ayahId); },
+        toggle(ayahId) {
+            console.log(`[DEBUG] BookmarkManager.toggle for ${ayahId}`);
+            const bookmarks = SettingsManager.get('bookmarks');
+            const index = bookmarks.indexOf(ayahId);
+            if (index > -1) bookmarks.splice(index, 1);
+            else bookmarks.push(ayahId);
+            this.save();
+            this.renderBookmarksIndexList();
+            const mainBtn = document.querySelector(`.ayah-display[data-ayah-id="${ayahId}"] .bookmark-ayah-btn`);
+            if (mainBtn) {
+                mainBtn.title = this.isBookmarked(ayahId) ? 'Unbookmark' : 'Bookmark';
+                mainBtn.innerHTML = `<svg viewBox="0 0 24 24">${this.isBookmarked(ayahId) ? '<path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>' : '<path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"/>'}</svg>`;
+            }
+        },
+        handleBookmarkBtn(event) { this.toggle(event.currentTarget.dataset.ayahId); },
+        renderBookmarksIndexList() {
+            console.log("[DEBUG] BookmarkManager.renderBookmarksIndexList called");
+            El.bookmarksIndexList.innerHTML = '';
+            const bookmarks = SettingsManager.get('bookmarks');
+            if (bookmarks.length === 0) {
+                El.bookmarksIndexList.innerHTML = '<li>No bookmarks yet.</li>';
+                return;
+            }
+            bookmarks.sort((a,b) => { 
+                const [sA, aA] = a.split('_').map(Number);
+                const [sB, aB] = b.split('_').map(Number);
+                if (sA === sB) return aA - aB;
+                return sA - sB;
+            }).forEach(ayahId => {
+                const ayahData = DataManager.getAyahById(ayahId);
+                if (!ayahData) { console.warn(`[DEBUG] Bookmark for non-existent Ayah ID: ${ayahId}`); return; }
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = `#${ayahId}`;
+                a.dataset.surahId = ayahData.surahNumber;
+                a.dataset.ayahId = ayahData.ayahNumber;
+                a.textContent = `${ayahData.surahNameEn} ${ayahData.surahNumber}:${ayahData.ayahNumber}`;
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    NavigationManager.goToSurah(ayahData.surahNumber, ayahData.ayahNumber);
+                    if (window.innerWidth <= 768) UIManager.toggleSidebar(false);
+                });
+                li.appendChild(a);
+                El.bookmarksIndexList.appendChild(li);
+            });
+        }
+    };
+    const NotesManager = { /* ... (same as before) ... */
+        load() { SettingsManager.get('notes'); },
+        save() { SettingsManager.update('notes', SettingsManager.get('notes')); },
+        getNote(ayahId) { return SettingsManager.get('notes')[ayahId] || ""; },
+        setNote(ayahId, text) {
+            console.log(`[DEBUG] NotesManager.setNote for ${ayahId}`);
+            const notes = SettingsManager.get('notes');
+            if (text.trim()) notes[ayahId] = text.trim();
+            else delete notes[ayahId]; 
+            this.save();
+        },
+        toggleNoteArea(event) {
+            const ayahId = event.currentTarget.dataset.ayahId;
+            console.log(`[DEBUG] NotesManager.toggleNoteArea for ${ayahId}`);
+            const noteArea = document.getElementById(`notes-area-${ayahId}`);
+            if (noteArea) noteArea.classList.toggle('hidden');
+        },
+        handleSaveNoteBtn(event) {
+            const ayahId = event.currentTarget.dataset.ayahId;
+            console.log(`[DEBUG] NotesManager.handleSaveNoteBtn for ${ayahId}`);
+            const textarea = document.querySelector(`#notes-area-${ayahId} textarea`);
+            if (textarea) {
+                this.setNote(ayahId, textarea.value);
+                alert("Note saved!");
+            }
+        }
+    };
+    const AudioManager = { /* ... (same as before) ... */
+        handlePlayAyahBtn(event) {
+            const s = parseInt(event.currentTarget.dataset.s);
+            const a = parseInt(event.currentTarget.dataset.a);
+            console.log(`[DEBUG] AudioManager.handlePlayAyahBtn: S${s}:A${a}`);
+            this.playAyah(s, a);
+            UIManager.toggleModal(El.audioControlsModal, true); 
+        },
+        playAyah(surahNum, ayahNum) {
+            console.log(`[DEBUG] AudioManager.playAyah: S${surahNum}:A${a}`);
+            currentAudioAyah = { surah: surahNum, ayah: ayahNum };
+            const reciter = SettingsManager.get('reciter');
+            const sStr = String(surahNum).padStart(3, '0');
+            const aStr = String(ayahNum).padStart(3, '0');
+            const audioSrc = `https://everyayah.com/data/${reciter}/${sStr}${aStr}.mp3`;
+            
+            El.ayahAudioPlayer.src = audioSrc;
+            El.ayahAudioPlayer.playbackRate = SettingsManager.get('audioPlaybackRate');
+            El.ayahAudioPlayer.play().catch(e => console.warn("[DEBUG] Audio play failed:", e));
+            El.currentPlayingAyahInfo.textContent = `Playing: S${surahNum}:A${ayahNum}`;
+            this.highlightPlayingAyah(surahNum, ayahNum);
+        },
+        togglePlayPause() {
+            console.log("[DEBUG] AudioManager.togglePlayPause");
+            if (El.ayahAudioPlayer.paused && El.ayahAudioPlayer.src) {
+                El.ayahAudioPlayer.play().catch(e => console.warn("[DEBUG] Audio play failed:", e));
+            } else {
+                El.ayahAudioPlayer.pause();
+            }
+        },
+        playNext() {
+            console.log("[DEBUG] AudioManager.playNext");
+            if (!currentAudioAyah) return;
+            const next = NavigationManager.getNextAyah(currentAudioAyah.surah, currentAudioAyah.ayah);
+            if (next) this.playAyah(next.surahNumber, next.ayahNumber);
+            else console.log("[DEBUG] End of Quran, cannot play next.");
+        },
+        playPrevious() {
+            console.log("[DEBUG] AudioManager.playPrevious");
+            if (!currentAudioAyah) return;
+            const prev = NavigationManager.getPreviousAyah(currentAudioAyah.surah, currentAudioAyah.ayah);
+            if (prev) this.playAyah(prev.surahNumber, prev.ayahNumber);
+            else console.log("[DEBUG] Beginning of Quran, cannot play previous.");
+        },
+        handleAudioEnded() {
+            console.log("[DEBUG] AudioManager.handleAudioEnded");
+            this.clearPlayingAyahHighlight();
+            if (SettingsManager.get('continuousPlay')) {
+                this.playNext();
+            } else {
+                isAudioPlaying = false;
+                El.audioPlayPauseBtn.innerHTML = `<svg viewBox="0 0 24 24" style="width:1.2em; height:1.2em; margin-right:0.3em;"><path d="M8 5v14l11-7z"/></svg> Play`;
+            }
+        },
+        highlightPlayingAyah(surahNum, ayahNum) {
+            this.clearPlayingAyahHighlight();
+            const ayahEl = document.getElementById(`ayah-${surahNum}_${ayahNum}`);
+            if (ayahEl) {
+                ayahEl.classList.add('active-playing-ayah');
+                const rect = ayahEl.getBoundingClientRect();
+                const contentAreaRect = El.contentArea.getBoundingClientRect(); 
+                if (rect.bottom < 0 || rect.top > contentAreaRect.height) { 
+                    ayahEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        },
+        clearPlayingAyahHighlight() {
+            document.querySelectorAll('.active-playing-ayah').forEach(el => el.classList.remove('active-playing-ayah'));
+        }
+    };
+
+
+    // --- App Initialization ---
+    async function initializeApp() {
+        console.log("[DEBUG] initializeApp called");
+        // Populate El object HERE
+        El = {
+            loadingIndicatorGlobal: document.getElementById('loadingIndicatorGlobal'),
+            loadingText: document.getElementById('loadingText'),
+            appContainer: document.getElementById('appContainer'),
+            sidebar: document.getElementById('sidebar'),
+            closeSidebarBtn: document.getElementById('closeSidebarBtn'),
+            mainContent: document.getElementById('mainContent'),
+            toggleSidebarBtn: document.getElementById('toggleSidebarBtn'),
+            lastReadBtn: document.getElementById('lastReadBtn'),
+            audioPlayerBtn: document.getElementById('audioPlayerBtn'),
+            settingsBtn: document.getElementById('settingsBtn'),
+            toggleFullscreenBtnApp: document.getElementById('toggleFullscreenBtnApp'),
+            fsIconOpen: document.getElementById('fsIconOpen'),
+            fsIconClose: document.getElementById('fsIconClose'),
+            contentArea: document.getElementById('contentArea'),
+            translationFileLoad: document.getElementById('translationFileLoad'),
+            quickNavSurah: document.getElementById('quickNavSurah'),
+            quickNavAyah: document.getElementById('quickNavAyah'),
+            quickNavGoBtn: document.getElementById('quickNavGoBtn'),
+            mainSearchInput: document.getElementById('mainSearchInput'),
+            mainSearchBtn: document.getElementById('mainSearchBtn'),
+            mainSuggestionsPanel: document.getElementById('mainSuggestionsPanel'),
+            initialMessage: document.getElementById('initialMessage'),
+            readingPane: document.getElementById('readingPane'),
+            searchResultsPane: document.getElementById('searchResultsPane'),
+            searchResultsContent: document.querySelector('#searchResultsPane .search-results-content'),
+            surahIndexList: document.getElementById('surahIndexList'),
+            juzIndexList: document.getElementById('juzIndexList'),
+            bookmarksIndexList: document.getElementById('bookmarksIndexList'),
+            sidebarTabBtns: document.querySelectorAll('.sidebar-tab-btn'),
+            settingsModal: document.getElementById('settingsModal'),
+            closeSettingsModalBtn: document.getElementById('closeSettingsModalBtn'),
+            themeSelector: document.getElementById('themeSelector'),
+            arabicFontSize: document.getElementById('arabicFontSize'),
+            arabicFontSizeValue: document.getElementById('arabicFontSizeValue'),
+            urduFontSize: document.getElementById('urduFontSize'),
+            urduFontSizeValue: document.getElementById('urduFontSizeValue'),
+            englishFontSize: document.getElementById('englishFontSize'),
+            englishFontSizeValue: document.getElementById('englishFontSizeValue'),
+            showUrduTranslationToggle: document.getElementById('showUrduTranslationToggle'),
+            showEnglishTranslationToggle: document.getElementById('showEnglishTranslationToggle'),
+            reciterSelect: document.getElementById('reciterSelect'),
+            audioPlaybackRate: document.getElementById('audioPlaybackRate'),
+            audioPlaybackRateValue: document.getElementById('audioPlaybackRateValue'),
+            audioControlsModal: document.getElementById('audioControlsModal'),
+            closeAudioControlsModalBtn: document.getElementById('closeAudioControlsModalBtn'),
+            currentPlayingAyahInfo: document.getElementById('currentPlayingAyahInfo'),
+            ayahAudioPlayer: document.getElementById('ayahAudioPlayer'),
+            audioPrevBtn: document.getElementById('audioPrevBtn'),
+            audioPlayPauseBtn: document.getElementById('audioPlayPauseBtn'),
+            audioNextBtn: document.getElementById('audioNextBtn'),
+            continuousPlayToggle: document.getElementById('continuousPlayToggle'),
+        };
+        console.log("[DEBUG] El object populated.");
+
+        UIManager.showGlobalLoading("Initializing Quran Vision...");
+        try {
+            await initDB(); 
+            await SettingsManager.load(); 
+            UIManager.init();       
+            BookmarkManager.load(); 
+            NotesManager.load();    
+            await DataManager.checkAndLoadInitialData(); 
+        } catch (error) {
+            console.error("[DEBUG] Critical error during app initialization:", error);
+            if (El.initialMessage) {
+                El.initialMessage.textContent = "A critical error occurred. Please refresh or check the console.";
+                El.initialMessage.style.color = "red";
+            }
+            UIManager.hideGlobalLoading();
+        }
+        console.log("[DEBUG] Quran Vision Initialized");
+    }
+
+    document.addEventListener('DOMContentLoaded', initializeApp);
+
+    </script>
+</body>
+</html>
+
+<script>
+// <script> // This is where you'd start your new script tag in the HTML
+
+
+
+
+// <script> // Start of your new script tag
+
+console.log("[DEBUG] Tilawat Mode Addon Script V3.3 Loaded.");
+
+const tilawatAddon_Manager = {
+    isActive: false,
+    currentSurah: 1,
+    currentAyah: 1,
+    currentLineOffset: 0, // For paginated, tracks lines within current ayah for page breaks
+    
+    linesPerPageChunk: 15, // For paginated: lines per page; For continuous: lines to load in one chunk
+    fontSize: 2.2, 
+    viewMode: 'paginated', 
+
+    ui: {
+        mainToggleButton: null,
+        controlBox: null,
+        contentWrapper: null,
+        openControlsButton: null,
+        dynamicNavControls: null, // For paginated view
+        // Control box inputs
+        ctrlSurahSelect: null,
+        ctrlAyahSelect: null,
+        ctrlLinesInput: null,
+        ctrlFontSizeInput: null,
+        ctrlFontSizeVal: null,
+        ctrlViewModeSelect: null,
+        loadMoreTrigger: null, // For IntersectionObserver in continuous scroll
+    },
+    
+    tempMeasureDiv: null,
+    isRendering: false, // Flag to prevent concurrent rendering
+    intersectionObserver: null,
+
+    touchStartX: 0,
+    touchEndX: 0,
+    isInitialized: false,
+
+    init() {
+        if (this.isInitialized) return;
+        console.log("[DEBUG] tilawatAddon_Manager.init called");
+
+        if (typeof SettingsManager === 'undefined' || typeof NavigationManager === 'undefined' || typeof DataManager === 'undefined' || typeof El === 'undefined' || typeof fullSurahMeta === 'undefined') {
+            console.error("[DEBUG] TilawatAddon: Essential main script objects not found. Aborting init.");
+            return;
+        }
+        if (!El.headerControls) {
+             console.error("[DEBUG] TilawatAddon: Main script's El.headerControls not found.");
+        }
+
+        this.linesPerPageChunk = SettingsManager.get('tilawatLinesPerPage') || 15;
+        this.fontSize = SettingsManager.get('tilawatFontSize') || 2.2;
+        this.viewMode = SettingsManager.get('tilawatViewMode') || 'paginated';
+        const lastPos = SettingsManager.get('tilawatLastPosition') || { surah: 1, ayah: 1, lineOffset: 0 };
+        this.currentSurah = lastPos.surah;
+        this.currentAyah = lastPos.ayah;
+        this.currentLineOffset = lastPos.lineOffset || 0;
+
+        this.createMainToggleButton();
+        this.createContentWrapper(); 
+        this.createControlBox();    
+        this.createOpenControlsButton();
+        this.applyTilawatSpecificStyles();
+
+        this.tempMeasureDiv = document.createElement('div');
+        this.tempMeasureDiv.style.position = 'absolute';
+        this.tempMeasureDiv.style.left = '-9999px';
+        this.tempMeasureDiv.style.visibility = 'hidden';
+        this.tempMeasureDiv.style.whiteSpace = 'nowrap'; 
+        this.tempMeasureDiv.style.fontFamily = 'var(--font-arabic)';
+        document.body.appendChild(this.tempMeasureDiv);
+        
+        this.isInitialized = true;
+        console.log("[DEBUG] tilawatAddon_Manager initialized successfully.");
+    },
+
+    createMainToggleButton() { /* ... (Same as previous, using this.ui.mainToggleButton and unique ID) ... */
+        console.log("[DEBUG] tilawatAddon_Manager.createMainToggleButton called");
+        if (!El.headerControls) return; 
+        if (document.getElementById('tilawatAddon_modeBtnMain')) return;
+
+        this.ui.mainToggleButton = document.createElement('button');
+        this.ui.mainToggleButton.id = 'tilawatAddon_modeBtnMain';
+        this.ui.mainToggleButton.className = 'btn btn-secondary icon-only'; 
+        this.ui.mainToggleButton.title = "Tilawat Mode";
+        this.ui.mainToggleButton.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20px" height="20px">
+                <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-3 10H9V6h8v8z"/>
+            </svg>
+            <span class="desktop-only">Tilawat</span>`;
+        this.ui.mainToggleButton.addEventListener('click', () => this.toggleMode());
+        El.headerControls.appendChild(this.ui.mainToggleButton);
+    },
+
+    createContentWrapper() { /* ... (Same as previous, using this.ui.contentWrapper and unique ID) ... */
+        if (this.ui.contentWrapper) return;
+        this.ui.contentWrapper = document.createElement('div');
+        this.ui.contentWrapper.id = 'tilawatAddon_contentWrapper';
+        this.ui.contentWrapper.className = 'tilawatAddon_content-wrapper'; 
+        document.body.appendChild(this.ui.contentWrapper);
+    },
+    
+    createControlBox() { /* ... (Same as previous, using this.ui.controlBox and unique IDs for elements within) ... */
+        if (this.ui.controlBox) return;
+        console.log("[DEBUG] tilawatAddon_Manager.createControlBox called");
+
+        this.ui.controlBox = document.createElement('div');
+        this.ui.controlBox.id = 'tilawatAddon_controlBox';
+        this.ui.controlBox.className = 'tilawatAddon_control-box hidden';
+
+        let surahOptions = '<option value="0" disabled>Select Surah</option>';
+        if (typeof fullSurahMeta !== 'undefined' && fullSurahMeta.length > 1) {
+             surahOptions += fullSurahMeta.slice(1).map(s => `<option value="${s.id}">${s.id}. ${s.name_en}</option>`).join('');
+        }
+        
+        this.ui.controlBox.innerHTML = `
+            <button id="tilawatAddon_closeCtrlBtn" class="tilawatAddon_ctrl-close">×</button>
+            <h4>Tilawat Controls</h4>
+            <div class="tilawatAddon_ctrl-group">
+                <label for="tilawatAddon_ctrlSurah">Surah:</label>
+                <select id="tilawatAddon_ctrlSurah">${surahOptions}</select>
+            </div>
+            <div class="tilawatAddon_ctrl-group">
+                <label for="tilawatAddon_ctrlAyah">Ayah:</label>
+                <select id="tilawatAddon_ctrlAyah"><option value="1">1</option></select> 
+            </div>
+            <div class="tilawatAddon_ctrl-group">
+                <label for="tilawatAddon_ctrlLines">Lines/Page (Paginated) or Chunk (Continuous):</label>
+                <input type="number" id="tilawatAddon_ctrlLines" value="${this.linesPerPageChunk}" min="5" max="50">
+            </div>
+            <div class="tilawatAddon_ctrl-group">
+                <label for="tilawatAddon_ctrlFontSize">Font Size (rem): <span id="tilawatAddon_ctrlFontSizeVal">${this.fontSize.toFixed(1)}</span></label>
+                <input type="range" id="tilawatAddon_ctrlFontSize" value="${this.fontSize}" min="1.5" max="4.0" step="0.1">
+            </div>
+            <div class="tilawatAddon_ctrl-group">
+                <label for="tilawatAddon_ctrlViewMode">View Mode:</label>
+                <select id="tilawatAddon_ctrlViewMode">
+                    <option value="paginated">Paginated</option>
+                    <option value="continuous">Continuous Scroll</option>
+                </select>
+            </div>
+            <button id="tilawatAddon_ctrlApplyBtn" class="tilawatAddon_ctrl-apply-btn">Apply & Read</button>
+        `;
+        document.body.appendChild(this.ui.controlBox);
+
+        this.ui.ctrlSurahSelect = document.getElementById('tilawatAddon_ctrlSurah');
+        this.ui.ctrlAyahSelect = document.getElementById('tilawatAddon_ctrlAyah');
+        this.ui.ctrlLinesInput = document.getElementById('tilawatAddon_ctrlLines');
+        this.ui.ctrlFontSizeInput = document.getElementById('tilawatAddon_ctrlFontSize');
+        this.ui.ctrlFontSizeVal = document.getElementById('tilawatAddon_ctrlFontSizeVal');
+        this.ui.ctrlViewModeSelect = document.getElementById('tilawatAddon_ctrlViewMode');
+
+        document.getElementById('tilawatAddon_closeCtrlBtn').addEventListener('click', () => this.toggleControlBox(false));
+        
+        this.ui.ctrlSurahSelect.addEventListener('change', (e) => {
+            const selectedSurah = parseInt(e.target.value);
+            this.ui.ctrlAyahSelect.innerHTML = ''; 
+            if (selectedSurah > 0 && fullSurahMeta[selectedSurah]) {
+                for (let i = 1; i <= fullSurahMeta[selectedSurah].num_ayahs; i++) {
+                    this.ui.ctrlAyahSelect.add(new Option(i, i));
+                }
+            }
+        });
+        
+        this.ui.ctrlLinesInput.addEventListener('change', (e) => {
+            this.linesPerPageChunk = parseInt(e.target.value) || 15;
+            SettingsManager.update('tilawatLinesPerPage', this.linesPerPageChunk);
+        });
+        
+        this.ui.ctrlFontSizeInput.addEventListener('input', (e) => {
+            this.fontSize = parseFloat(e.target.value);
+            this.ui.ctrlFontSizeVal.textContent = this.fontSize.toFixed(1);
+            if (this.isActive && this.ui.contentWrapper) {
+                this.ui.contentWrapper.style.setProperty('--tilawatAddon-dynamic-font-size', `${this.fontSize}rem`);
+            }
+        });
+        this.ui.ctrlFontSizeInput.addEventListener('change', (e) => { 
+            SettingsManager.update('tilawatFontSize', this.fontSize);
+        });
+
+        this.ui.ctrlViewModeSelect.value = this.viewMode;
+        this.ui.ctrlViewModeSelect.addEventListener('change', (e) => {
+            this.viewMode = e.target.value;
+            SettingsManager.update('tilawatViewMode', this.viewMode);
+            if(this.isActive) this.loadAndRenderContent();
+        });
+
+        document.getElementById('tilawatAddon_ctrlApplyBtn').addEventListener('click', () => {
+            this.currentSurah = parseInt(this.ui.ctrlSurahSelect.value);
+            this.currentAyah = parseInt(this.ui.ctrlAyahSelect.value);
+            this.currentLineOffset = 0; 
+            this.linesPerPageChunk = parseInt(this.ui.ctrlLinesInput.value);
+            this.fontSize = parseFloat(this.ui.ctrlFontSizeInput.value);
+            this.viewMode = this.ui.ctrlViewModeSelect.value;
+
+            SettingsManager.update('tilawatLinesPerPage', this.linesPerPageChunk);
+            SettingsManager.update('tilawatFontSize', this.fontSize);
+            SettingsManager.update('tilawatViewMode', this.viewMode);
+            
+            this.loadAndRenderContent();
+            this.toggleControlBox(false);
+        });
+    },
+
+    createOpenControlsButton() { /* ... (Same as previous, using this.ui.openControlsButton and unique ID) ... */
+        if (this.ui.openControlsButton) return;
+        this.ui.openControlsButton = document.createElement('button');
+        this.ui.openControlsButton.id = 'tilawatAddon_openCtrlBtn';
+        this.ui.openControlsButton.className = 'tilawatAddon_open-ctrl-btn hidden'; 
+        this.ui.openControlsButton.title = "Open Tilawat Controls";
+        this.ui.openControlsButton.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="24px" height="24px"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>`;
+        this.ui.openControlsButton.onclick = () => this.toggleControlBox(true);
+        document.body.appendChild(this.ui.openControlsButton);
+    },
+
+    toggleControlBox(forceShow) { /* ... (Same as previous, using this.ui.controlBox and unique IDs for elements within) ... */
+        if (!this.ui.controlBox) this.createControlBox();
+        const shouldShow = typeof forceShow === 'boolean' ? forceShow : this.ui.controlBox.classList.contains('hidden');
+        
+        if (shouldShow) {
+            const lastPos = SettingsManager.get('tilawatLastPosition');
+            this.ui.ctrlSurahSelect.value = this.currentSurah || lastPos.surah;
+            this.ui.ctrlSurahSelect.dispatchEvent(new Event('change')); 
+            this.ui.ctrlAyahSelect.value = this.currentAyah || lastPos.ayah;
+            this.ui.ctrlLinesInput.value = SettingsManager.get('tilawatLinesPerPage');
+            this.ui.ctrlFontSizeInput.value = SettingsManager.get('tilawatFontSize');
+            this.ui.ctrlFontSizeVal.textContent = SettingsManager.get('tilawatFontSize').toFixed(1);
+            this.ui.ctrlViewModeSelect.value = SettingsManager.get('tilawatViewMode');
+        }
+        this.ui.controlBox.classList.toggle('hidden', !shouldShow);
+    },
+    
+    applyTilawatSpecificStyles() { /* ... (Same as previous, using unique class names and --tilawatAddon-dynamic-font-size) ... */
+        console.log("[DEBUG] tilawatAddon_Manager.applyTilawatSpecificStyles called");
+        const styleId = 'tilawatAddon_dynamic-styles'; 
+        if (document.getElementById(styleId)) return;
+
+        const css = `
+            body.tilawatAddon_active-global { 
+                background-color: #000000 !important;
+                color: #FFFFFF !important;
+                overflow: hidden !important;
+                font-family: var(--font-arabic); 
+            }
+            .tilawatAddon_element-hidden { /* Unique class */
+                display: none !important;
+            }
+            .tilawatAddon_content-wrapper { /* Unique class */
+                display: none; 
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background-color: #000000; 
+                color: #FFFFFF; 
+                z-index: 2000; 
+                overflow-y: auto;
+                padding: 20px; 
+                direction: rtl;
+                font-size: var(--tilawatAddon-dynamic-font-size, ${this.fontSize}rem);
+            }
+            .tilawatAddon_content-wrapper.active {
+                display: block;
+            }
+            .tilawatAddon_arabic-line { /* Unique class */
+                line-height: 1.65; 
+                text-align: right;
+                margin-bottom: 0.25em; 
+                white-space: normal; 
+            }
+            .tilawatAddon_surah-start-indicator { /* Unique class */
+                font-size: calc(var(--tilawatAddon-dynamic-font-size, ${this.fontSize}rem) * 0.9);
+                text-align: center;
+                padding: 0.7em 0;
+                margin: 1.5em 0;
+                border-top: 1px solid #333;
+                border-bottom: 1px solid #333;
+                color: #bbb;
+            }
+            .tilawatAddon_control-box { /* Unique class */
+                position: fixed;
+                top: 15px; right: 15px;
+                background-color: rgba(25, 25, 25, 0.95);
+                backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 6px 25px rgba(0,0,0,0.5);
+                z-index: 2020;
+                width: 300px;
+                border: 1px solid rgba(255,255,255,0.08);
+            }
+            .tilawatAddon_control-box.hidden { display: none; }
+            .tilawatAddon_control-box h4 { margin-top: 0; margin-bottom: 18px; border-bottom: 1px solid #444; padding-bottom: 12px; font-weight:600; font-family: var(--font-sans); }
+            .tilawatAddon_ctrl-group { margin-bottom: 12px; font-family: var(--font-sans); }
+            .tilawatAddon_ctrl-group label { display: block; margin-bottom: 6px; font-size: 0.85em; color: #ddd; }
+            .tilawatAddon_ctrl-group select, .tilawatAddon_ctrl-group input[type="number"], .tilawatAddon_ctrl-group input[type="range"] {
+                width: 100%; padding: 9px; border-radius: 5px; border: 1px solid #555;
+                background-color: #282828; color: white; font-size:0.9em;
+            }
+            .tilawatAddon_ctrl-group input[type="range"] { padding: 0; accent-color: var(--primary-color); } 
+            .tilawatAddon_ctrl-close { /* Unique class */
+                position: absolute; top: 10px; right: 10px;
+                background: none; border: none; color: #aaa; font-size: 1.8em; cursor: pointer; line-height:1;
+            }
+            .tilawatAddon_ctrl-close:hover { color: white; }
+            .tilawatAddon_ctrl-apply-btn { /* Unique class */
+                 width: 100%; margin-top:15px; background-color: var(--primary-color); color:white; border:none; padding: 10px; font-weight: 500; border-radius: 5px; cursor:pointer;
+            }
+            .tilawatAddon_open-ctrl-btn { /* Unique class */
+                position: fixed;
+                top: 15px; right: 15px; 
+                z-index: 2005; 
+                padding: 0.6rem;
+                background-color: rgba(40, 40, 40, 0.85);
+                border: 1px solid rgba(255,255,255,0.1);
+                color: white;
+                border-radius: 50%; 
+                width: 40px; height: 40px;
+                display: flex; align-items: center; justify-content: center;
+                cursor: pointer;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            }
+            .tilawatAddon_open-ctrl-btn.hidden { display: none; }
+
+            .tilawatAddon_nav-controls { /* Unique class */
+                position: fixed;
+                bottom: 15px;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 2010;
+                display: flex;
+                gap: 0.8rem;
+                padding: 0.6rem 1rem;
+                background-color: hsla(0, 0%, 10%, 0.9);
+                backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-md);
+                border: 1px solid rgba(255,255,255,0.08);
+            }
+             .tilawatAddon_nav-controls button {
+                padding: 0.5rem 1rem; font-size: 0.9rem; border-radius: 4px;
+                border: 1px solid #555; background-color: #333; color: white; cursor: pointer;
+            }
+            .tilawatAddon_nav-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
+            #tilawatAddon_loadMoreTrigger { height: 50px; width: 100%; } /* For IntersectionObserver */
+        `;
+        const styleSheet = document.createElement("style");
+        styleSheet.id = styleId;
+        styleSheet.innerText = css;
+        document.head.appendChild(styleSheet);
+    },
+
+    toggleMode() {
+        this.isActive = !this.isActive;
+        // SettingsManager.update('tilawatModeActive', this.isActive); // Only for persistence, not direct control
+        console.log(`[DEBUG] Tilawat Mode toggled. Active: ${this.isActive}`);
+
+        document.body.classList.toggle('tilawatAddon_active-global', this.isActive);
+        
+        const mainAppSelectors = [ 
+            'header', '.sidebar', '.top-panel', '#searchResultsPane', 
+            '#settingsModal', '#audioControlsModal', '#readingPane'
+        ];
+
+        if (this.isActive) {
+            currentDisplay.mode = 'tilawat'; // Update global display mode if your main app uses it
+            this.originalPageStyles = {};
+            mainAppSelectors.forEach(selector => {
+                document.querySelectorAll(selector).forEach(el => {
+                    const currentDisplayProp = window.getComputedStyle(el).display;
+                    if (currentDisplayProp !== 'none') {
+                        this.originalPageStyles[selector] = this.originalPageStyles[selector] || [];
+                        this.originalPageStyles[selector].push({element: el, display: currentDisplayProp});
+                    }
+                    el.classList.add('tilawatAddon_element-hidden');
+                });
+            });
+            
+            this.ui.contentWrapper.classList.add('active');
+            this.ui.contentWrapper.style.setProperty('--tilawatAddon-dynamic-font-size', `${this.fontSize}rem`);
+
+            this.ui.openControlsButton.classList.remove('hidden');
+            this.ui.openControlsButton.classList.remove('tilawatAddon_element-hidden');
+
+
+            if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.warn("[DEBUG] Tilawat mode fullscreen request failed:", err.message);
+                });
+            }
+            
+            const lastPos = SettingsManager.get('tilawatLastPosition') || { surah: 1, ayah: 1, lineOffset: 0 };
+            this.currentSurah = lastPos.surah;
+            this.currentAyah = lastPos.ayah;
+            this.currentLineOffset = lastPos.lineOffset || 0;
+            this.linesPerPageChunk = SettingsManager.get('tilawatLinesPerPage');
+            this.fontSize = SettingsManager.get('tilawatFontSize');
+            this.viewMode = SettingsManager.get('tilawatViewMode');
+
+            this.loadAndRenderContent(true); // true for initial load/reset
+            this.addGlobalListeners();
+
+        } else { 
+            // currentDisplay.mode = 'surah'; // Revert to a default main app mode
+            mainAppSelectors.forEach(selector => {
+                 document.querySelectorAll(selector).forEach(el => {
+                    el.classList.remove('tilawatAddon_element-hidden');
+                 });
+            });
+
+            this.ui.contentWrapper.classList.remove('active');
+            this.removeNavigationControlsDynamic();
+            this.toggleControlBox(false); 
+            this.ui.openControlsButton.classList.add('hidden');
+
+
+            if (document.exitFullscreen && document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+            // Restore main app view.
+            if (typeof UIManager !== 'undefined' && typeof NavigationManager !== 'undefined' && typeof NavigationManager.redisplayCurrentView === 'function') {
+                 NavigationManager.redisplayCurrentView(); 
+            } else {
+                if(El.readingPane) El.readingPane.classList.remove('hidden'); // Basic fallback
+            }
+            this.removeGlobalListeners();
+            this.destroyIntersectionObserver();
+        }
+        
+        if (this.ui.mainToggleButton) {
+            this.ui.mainToggleButton.classList.toggle('active', this.isActive); 
+            this.ui.mainToggleButton.title = this.isActive ? "Exit Tilawat Mode" : "Enter Tilawat Mode";
+        }
+    },
+
+    addGlobalListeners() { /* ... (Same as previous, ensure 'this' context) ... */
+        console.log("[DEBUG] Adding global listeners for Tilawat Mode.");
+        // Bind 'this' explicitly or use arrow functions for handlers
+        this._boundHandleKeyPress = this.handleKeyPress.bind(this);
+        this._boundHandleTouchStart = this.handleTouchStart.bind(this);
+        this._boundHandleTouchEnd = this.handleTouchEnd.bind(this);
+
+        document.addEventListener('keydown', this._boundHandleKeyPress);
+        this.ui.contentWrapper.addEventListener('touchstart', this._boundHandleTouchStart, { passive: true });
+        this.ui.contentWrapper.addEventListener('touchend', this._boundHandleTouchEnd, false);
+    },
+    removeGlobalListeners() { /* ... (Same as previous, ensure 'this' context) ... */
+        console.log("[DEBUG] Removing global listeners for Tilawat Mode.");
+        document.removeEventListener('keydown', this._boundHandleKeyPress);
+        if (this.ui.contentWrapper) { 
+            this.ui.contentWrapper.removeEventListener('touchstart', this._boundHandleTouchStart, false);
+            this.ui.contentWrapper.removeEventListener('touchend', this._boundHandleTouchEnd, false);
+        }
+    },
+    handleKeyPress (event) { // Now 'this' refers to TilawatModeAddon
+        if (!this.isActive) return;
+        if (event.key === "ArrowRight" || event.key === "PageDown") {
+            event.preventDefault(); this.next();
+        } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
+            event.preventDefault(); this.previous();
+        } else if (event.key === "Escape") {
+            event.preventDefault();
+            if (this.ui.controlBox && !this.ui.controlBox.classList.contains('hidden')) {
+                this.toggleControlBox(false);
+            } else {
+                this.toggleMode(); 
+            }
+        }
+    },
+    handleTouchStart (event) { this.touchStartX = event.changedTouches[0].screenX; },
+    handleTouchEnd (event) {
+        this.touchEndX = event.changedTouches[0].screenX;
+        this.handleSwipeGesture();
+    },
+    handleSwipeGesture() { /* ... (Same as previous, using 'this') ... */
+        const swipeThreshold = 50; 
+        if (this.touchEndX < this.touchStartX - swipeThreshold) {
+            this.next(); 
+        }
+        if (this.touchEndX > this.touchStartX + swipeThreshold) {
+            this.previous(); 
+        }
+    },
+    
+    async loadAndRenderContent(isInitialOrReset = false) {
+        if (!this.isActive || this.isRendering) return;
+        this.isRendering = true;
+        console.log(`[DEBUG] TilawatMode: loadAndRenderContent. S${this.currentSurah}:A${this.currentAyah}, LOffset ${this.currentLineOffset}, View: ${this.viewMode}, Initial: ${isInitialOrReset}`);
+        
+        if (isInitialOrReset) {
+            this.ui.contentWrapper.innerHTML = ''; // Clear for full reload or initial
+            this.currentLineOffset = SettingsManager.get('tilawatLastPosition').lineOffset || 0; // Reset line offset for the specific ayah
+        }
+        this.ui.contentWrapper.style.setProperty('--tilawatAddon-dynamic-font-size', `${this.fontSize}rem`);
+
+        let linesRenderedThisChunk = 0;
+        let currentProcS = this.currentSurah;
+        let currentProcA = this.currentAyah;
+        let currentProcLOffset = this.currentLineOffset;
+
+        let currentAyahData = DataManager.getAyahById(`${currentProcS}_${currentProcA}`);
+
+        if (!currentAyahData) {
+            console.warn("[DEBUG] TilawatMode: Current Ayah data not found during render. Resetting.");
+            this.currentSurah = 1; this.currentAyah = 1; this.currentLineOffset = 0;
+            currentProcS = 1; currentProcA = 1; currentProcLOffset = 0;
+            currentAyahData = DataManager.getAyahById("1_1");
+            if (!currentAyahData) {
+                 this.ui.contentWrapper.innerHTML = "<p>Error: Quran data not available.</p>"; 
+                 this.isRendering = false; return;
+            }
+        }
+        
+        const firstAyahForThisRenderPass = currentAyahData; // Ayah we start rendering from in this call
+
+        let firstLineOfPageRendered = (this.ui.contentWrapper.childNodes.length === 0); // True if wrapper is empty
+
+        while (linesRenderedThisChunk < this.linesPerPageChunk && currentAyahData) {
+            if ( (firstLineOfPageRendered && currentProcLOffset === 0) || 
+                 (currentAyahData.ayahNumber === 1 && currentProcLOffset === 0) ) {
+                if (currentAyahData.ayahNumber === 1 && currentAyahData.surahNumber !==1 ) {
+                    const surahInfo = fullSurahMeta[currentAyahData.surahNumber];
+                    if (this.ui.contentWrapper.lastChild?.className !== 'tilawatAddon_surah-start-indicator' || 
+                        this.ui.contentWrapper.lastChild?.dataset.surahId !== String(currentAyahData.surahNumber)) {
+                        const surahHeader = document.createElement('div');
+                        surahHeader.className = 'tilawatAddon_surah-start-indicator';
+                        surahHeader.dataset.surahId = currentAyahData.surahNumber;
+                        surahHeader.textContent = `سورة ${surahInfo.name_ar}`;
+                        this.ui.contentWrapper.appendChild(surahHeader);
+                    }
+
+                    if (currentAyahData.surahNumber !== 9) {
+                        const bismillah = document.createElement('p');
+                        bismillah.className = 'tilawatAddon_arabic-line';
+                        bismillah.style.textAlign = 'center';
+                        bismillah.style.fontSize = `calc(var(--tilawatAddon-dynamic-font-size) * 0.9)`;
+                        bismillah.textContent = 'بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ';
+                        this.ui.contentWrapper.appendChild(bismillah);
+                        linesRenderedThisChunk++; 
+                        if (linesRenderedThisChunk >= this.linesPerPageChunk && this.viewMode === 'paginated') break;
+                    }
+                }
+            }
+            
+            const ayahLines = await this.splitAyahIntoLines(currentAyahData.arabicText, this.ui.contentWrapper.clientWidth - 40);
+            const linesToRenderFromThisAyah = ayahLines.slice(currentProcLOffset);
+
+            for (const lineText of linesToRenderFromThisAyah) {
+                if (linesRenderedThisChunk >= this.linesPerPageChunk && this.viewMode === 'paginated') break;
+
+                const lineEl = document.createElement('p');
+                lineEl.className = 'tilawatAddon_arabic-line';
+                lineEl.textContent = lineText;
+                this.ui.contentWrapper.appendChild(lineEl);
+                linesRenderedThisChunk++;
+                currentProcLOffset++; 
+            }
+
+            if (linesRenderedThisChunk >= this.linesPerPageChunk && this.viewMode === 'paginated') break;
+
+            if (currentProcLOffset >= ayahLines.length) { 
+                const nextAyahData = NavigationManager.getNextAyah(currentAyahData.surahNumber, currentAyahData.ayahNumber);
+                if (nextAyahData) {
+                    currentAyahData = nextAyahData;
+                    currentProcS = nextAyahData.surahNumber; // Update processing S,A
+                    currentProcA = nextAyahData.ayahNumber;
+                    currentProcLOffset = 0; 
+                } else {
+                    currentAyahData = null; 
+                    break;
+                }
+            } else {
+                // More lines in current ayah, but page is full (paginated) or chunk loaded (continuous)
+                break; 
+            }
+            firstLineOfPageRendered = false; // After the first ayah is processed (or part of it)
+        }
+        
+        // Update main state variables to where we *actually* stopped or will start next
+        this.currentSurah = currentProcS;
+        this.currentAyah = currentProcA;
+        this.currentLineOffset = currentProcLOffset;
+        // If we finished an ayah, reset offset for the *next* ayah
+        if (currentAyahData && this.currentLineOffset >= (await this.splitAyahIntoLines(currentAyahData.arabicText, this.ui.contentWrapper.clientWidth - 40)).length) {
+            const nextForState = NavigationManager.getNextAyah(this.currentSurah, this.currentAyah);
+            if (nextForState) {
+                this.currentSurah = nextForState.surahNumber;
+                this.currentAyah = nextForState.ayahNumber;
+                this.currentLineOffset = 0;
+            } else {
+                // At the very end of Quran, currentLineOffset might remain pointing past last line of last ayah
+            }
+        }
+
+
+        if (this.viewMode === 'paginated') {
+            this.addNavigationControlsDynamic(); 
+        } else { // Continuous
+            this.removeNavigationControlsDynamic(); 
+            this.setupIntersectionObserver();
+            if (isInitialOrReset) this.ui.contentWrapper.scrollTop = 0; 
+        }
+        
+        if (firstAyahForThisRenderPass) { // Save the S:A we started rendering this page/chunk with
+             SettingsManager.update('tilawatLastPosition', { 
+                surah: firstAyahForThisRenderPass.surahNumber, 
+                ayah: firstAyahForThisRenderPass.ayahNumber,
+                lineOffset: (this.viewMode === 'paginated') ? 0 : this.currentLineOffset // For continuous, save actual offset
+            });
+        }
+        this.isRendering = false;
+        console.log(`[DEBUG] TilawatMode: Content rendered. Lines this chunk: ${linesRenderedThisChunk}. Next load S${this.currentSurah}:A${this.currentAyah} L${this.currentLineOffset}`);
+    },
+
+    async splitAyahIntoLines(text, maxWidthPx) { /* ... (Same as previous, ensure tempMeasureDiv is used) ... */
+        if (!this.tempMeasureDiv) {
+            console.error("[DEBUG] tempMeasureDiv not initialized for splitAyahIntoLines");
+            return [text]; 
+        }
+        this.tempMeasureDiv.style.fontSize = this.ui.contentWrapper.style.getPropertyValue('--tilawatAddon-dynamic-font-size') || `${this.fontSize}rem`;
+
+        const words = text.split(/\s+/);
+        if (!words.length) return [];
+        const lines = [];
+        let currentLine = "";
+
+        for (const word of words) {
+            const testLine = currentLine + (currentLine ? " " : "") + word;
+            this.tempMeasureDiv.textContent = testLine;
+            if (this.tempMeasureDiv.offsetWidth <= maxWidthPx) {
+                currentLine = testLine;
+            } else {
+                if (currentLine) lines.push(currentLine);
+                currentLine = word; 
+                this.tempMeasureDiv.textContent = currentLine;
+                if (this.tempMeasureDiv.offsetWidth > maxWidthPx && currentLine.length > 0) {
+                    lines.push(currentLine);
+                    currentLine = "";
+                }
+            }
+        }
+        if (currentLine) lines.push(currentLine);
+        return lines.length > 0 ? lines : [text]; 
+    },
+    
+    removeNavigationControlsDynamic() { /* ... (Same as previous, use this.ui.dynamicNavControls) ... */
+        if (this.ui.dynamicNavControls) {
+            this.ui.dynamicNavControls.remove();
+            this.ui.dynamicNavControls = null;
+        }
+    },
+
+    addNavigationControlsDynamic() { /* ... (Same as previous, use this.ui.dynamicNavControls and unique ID) ... */
+        this.removeNavigationControlsDynamic();
+
+        this.ui.dynamicNavControls = document.createElement('div');
+        this.ui.dynamicNavControls.id = 'tilawatAddon_navControls'; // Unique ID
+        this.ui.dynamicNavControls.className = 'tilawatAddon_nav-controls';
+
+        const prevBtn = document.createElement('button');
+        prevBtn.innerHTML = '← Previous';
+        prevBtn.disabled = (this.currentSurah === 1 && this.currentAyah === 1 && this.currentLineOffset === 0);
+        prevBtn.onclick = () => this.previous();
+
+        const nextBtn = document.createElement('button');
+        nextBtn.innerHTML = 'Next →';
+        
+        let isEndOfContent = false;
+        const lastAyahDataOnPage = DataManager.getAyahById(`${this.currentSurah}_${this.currentAyah}`);
+        if (lastAyahDataOnPage) {
+            // This check needs to be more robust for "end of content"
+            // It should check if the *next* call to loadAndRenderContent would yield anything
+            const nextAyahIfAdvanced = NavigationManager.getNextAyah(this.currentSurah, this.currentAyah);
+            if (!nextAyahIfAdvanced && this.currentLineOffset >= (await this.splitAyahIntoLines(lastAyahDataOnPage.arabicText, this.ui.contentWrapper.clientWidth - 40)).length) {
+                 isEndOfContent = true;
+            }
+        } else if (!DataManager.getAyahById(`${this.currentSurah}_${this.currentAyah+1}`) && !DataManager.getAyahById(`${this.currentSurah+1}_1`)) {
+            // If current ayah itself doesn't exist and no next surah/ayah, it's end.
+            isEndOfContent = true;
+        }
+        nextBtn.disabled = isEndOfContent;
+        nextBtn.onclick = () => this.next();
+
+        this.ui.dynamicNavControls.appendChild(prevBtn);
+        this.ui.dynamicNavControls.appendChild(nextBtn);
+        document.body.appendChild(this.ui.dynamicNavControls);
+    },
+
+    async next() { 
+        console.log("[DEBUG] TilawatMode.next called. Current: S" + this.currentSurah + " A" + this.currentAyah + " L" + this.currentLineOffset);
+        // For paginated view, loadAndRenderContent will use the already advanced state vars.
+        // For continuous, this might be triggered by observer, so it should append.
+        // The current loadAndRenderContent clears and re-renders the *next* chunk.
+        if (this.viewMode === 'paginated') {
+            await this.loadAndRenderContent(true); // true to clear and render next page
+        } else { // Continuous
+            // In continuous, 'next' means load more if not already loading
+            if (!this.isRendering) await this.loadAndRenderContent(false); // false to append
+        }
+    },
+
+    async previous() { 
+        console.log("[DEBUG] TilawatMode.previous called. Current: S" + this.currentSurah + " A" + this.currentAyah + " L" + this.currentLineOffset);
+        if (this.viewMode === 'continuous') {
+            console.log("[DEBUG] Previous not implemented for continuous scroll in this simple version. User can scroll up.");
+            return; // Simple continuous scroll doesn't have a "previous page" concept easily
+        }
+        
+        let targetS = this.currentSurah;
+        let targetA = this.currentAyah;
+        // For paginated, we need to find the start of the *previous page*.
+        // This means rewinding roughly `linesPerPageChunk` lines from the *start* of the current page.
+        // The current `this.currentSurah, this.currentAyah, this.currentLineOffset` point to the START of the NEXT page.
+        // So, we need to rewind from there.
+
+        const lastPosition = SettingsManager.get('tilawatLastPosition');
+        targetS = lastPosition.surah;
+        targetA = lastPosition.ayah;
+        let targetL = lastPosition.lineOffset || 0;
+
+
+        let linesToRewind = this.linesPerPageChunk; 
+        if (targetL > 0) { // If current page started mid-ayah
+            const rewindInCurrentAyah = Math.min(targetL, linesToRewind);
+            targetL -= rewindInCurrentAyah;
+            linesToRewind -= rewindInCurrentAyah;
+        }
+
+        while (linesToRewind > 0) {
+            const prevAyahData = NavigationManager.getPreviousAyah(targetS, targetA);
+            if (prevAyahData) {
+                targetS = prevAyahData.surahNumber;
+                targetA = prevAyahData.ayahNumber;
+                const prevAyahLines = await this.splitAyahIntoLines(prevAyahData.arabicText, this.ui.contentWrapper ? (this.ui.contentWrapper.clientWidth - 40) : 500);
+                const linesInPrevAyah = prevAyahLines.length;
+                
+                if (linesToRewind <= linesInPrevAyah) {
+                    targetL = Math.max(0, linesInPrevAyah - linesToRewind);
+                    linesToRewind = 0;
+                } else {
+                    targetL = 0;
+                    linesToRewind -= linesInPrevAyah;
+                }
+            } else {
+                targetS = 1; targetA = 1; targetL = 0;
+                break; 
+            }
+        }
+        
+        this.currentSurah = targetS;
+        this.currentAyah = targetA;
+        this.currentLineOffset = targetL;
+
+        await this.loadAndRenderContent(true); // true to clear and render previous page
+    },
+
+    setupIntersectionObserver() {
+        if (this.viewMode !== 'continuous' || this.intersectionObserver) return;
+        console.log("[DEBUG] Setting up IntersectionObserver for continuous scroll.");
+
+        this.ui.loadMoreTrigger = document.createElement('div');
+        this.ui.loadMoreTrigger.id = 'tilawatAddon_loadMoreTrigger';
+        this.ui.contentWrapper.appendChild(this.ui.loadMoreTrigger);
+
+        const options = {
+            root: this.ui.contentWrapper, // Observe within the content wrapper
+            rootMargin: '0px 0px 200px 0px', // Trigger when 200px from bottom
+            threshold: 0.01 
+        };
+
+        this.intersectionObserver = new IntersectionObserver(async (entries) => {
+            if (entries[0].isIntersecting && !this.isRendering) {
+                console.log("[DEBUG] Load more trigger intersected.");
+                // Check if there's actually more content to load
+                const lastAyahData = DataManager.getAyahById(`${this.currentSurah}_${this.currentAyah}`);
+                if (lastAyahData) {
+                    const linesOfLastAyah = await this.splitAyahIntoLines(lastAyahData.arabicText, this.ui.contentWrapper.clientWidth - 40);
+                    if (this.currentLineOffset >= linesOfLastAyah.length) { // If we are past the lines of current ayah
+                        const nextAyahAfterCurrent = NavigationManager.getNextAyah(this.currentSurah, this.currentAyah);
+                        if (!nextAyahAfterCurrent) {
+                            console.log("[DEBUG] IntersectionObserver: End of Quran, detaching observer.");
+                            this.destroyIntersectionObserver(); // No more to load
+                            return;
+                        }
+                    }
+                } else if (!DataManager.getAyahById(`${this.currentSurah}_${this.currentAyah+1}`) && !DataManager.getAyahById(`${this.currentSurah+1}_1`)) {
+                     console.log("[DEBUG] IntersectionObserver: End of Quran (current ayah not found), detaching observer.");
+                     this.destroyIntersectionObserver();
+                     return;
+                }
+                await this.loadAndRenderContent(false); // false to append
+            }
+        }, options);
+        this.intersectionObserver.observe(this.ui.loadMoreTrigger);
+    },
+
+    destroyIntersectionObserver() {
+        if (this.intersectionObserver) {
+            if (this.ui.loadMoreTrigger) {
+                this.intersectionObserver.unobserve(this.ui.loadMoreTrigger);
+                this.ui.loadMoreTrigger.remove();
+                this.ui.loadMoreTrigger = null;
+            }
+            this.intersectionObserver.disconnect();
+            this.intersectionObserver = null;
+            console.log("[DEBUG] IntersectionObserver destroyed.");
+        }
+    }
+};
+
+
+// --- App Initialization ---
+async function initializeApp() {
+    console.log("[DEBUG] initializeApp called");
+    El = { /* ... (Populate El as in previous fix, ensure El.headerControls is correct) ... */
+        loadingIndicatorGlobal: document.getElementById('loadingIndicatorGlobal'),
+        loadingText: document.getElementById('loadingText'),
+        appContainer: document.getElementById('appContainer'),
+        sidebar: document.getElementById('sidebar'),
+        closeSidebarBtn: document.getElementById('closeSidebarBtn'),
+        mainContent: document.getElementById('mainContent'),
+        toggleSidebarBtn: document.getElementById('toggleSidebarBtn'),
+        lastReadBtn: document.getElementById('lastReadBtn'),
+        audioPlayerBtn: document.getElementById('audioPlayerBtn'),
+        settingsBtn: document.getElementById('settingsBtn'),
+        toggleFullscreenBtnApp: document.getElementById('toggleFullscreenBtnApp'),
+        fsIconOpen: document.getElementById('fsIconOpen'),
+        fsIconClose: document.getElementById('fsIconClose'),
+        headerControls: document.querySelector('header .header-controls'), 
+        topPanel: document.querySelector('.top-panel'), 
+        contentArea: document.getElementById('contentArea'),
+        translationFileLoad: document.getElementById('translationFileLoad'),
+        quickNavSurah: document.getElementById('quickNavSurah'),
+        quickNavAyah: document.getElementById('quickNavAyah'),
+        quickNavGoBtn: document.getElementById('quickNavGoBtn'),
+        mainSearchInput: document.getElementById('mainSearchInput'),
+        mainSearchBtn: document.getElementById('mainSearchBtn'),
+        mainSuggestionsPanel: document.getElementById('mainSuggestionsPanel'),
+        initialMessage: document.getElementById('initialMessage'),
+        readingPane: document.getElementById('readingPane'),
+        searchResultsPane: document.getElementById('searchResultsPane'),
+        searchResultsContent: document.querySelector('#searchResultsPane .search-results-content'),
+        surahIndexList: document.getElementById('surahIndexList'),
+        juzIndexList: document.getElementById('juzIndexList'),
+        bookmarksIndexList: document.getElementById('bookmarksIndexList'),
+        sidebarTabBtns: document.querySelectorAll('.sidebar-tab-btn'),
+        settingsModal: document.getElementById('settingsModal'),
+        closeSettingsModalBtn: document.getElementById('closeSettingsModalBtn'),
+        themeSelector: document.getElementById('themeSelector'),
+        arabicFontSize: document.getElementById('arabicFontSize'),
+        arabicFontSizeValue: document.getElementById('arabicFontSizeValue'),
+        urduFontSize: document.getElementById('urduFontSize'),
+        urduFontSizeValue: document.getElementById('urduFontSizeValue'),
+        englishFontSize: document.getElementById('englishFontSize'),
+        englishFontSizeValue: document.getElementById('englishFontSizeValue'),
+        showUrduTranslationToggle: document.getElementById('showUrduTranslationToggle'),
+        showEnglishTranslationToggle: document.getElementById('showEnglishTranslationToggle'),
+        reciterSelect: document.getElementById('reciterSelect'),
+        audioPlaybackRate: document.getElementById('audioPlaybackRate'),
+        audioPlaybackRateValue: document.getElementById('audioPlaybackRateValue'),
+        audioControlsModal: document.getElementById('audioControlsModal'),
+        closeAudioControlsModalBtn: document.getElementById('closeAudioControlsModalBtn'),
+        currentPlayingAyahInfo: document.getElementById('currentPlayingAyahInfo'),
+        ayahAudioPlayer: document.getElementById('ayahAudioPlayer'),
+        audioPrevBtn: document.getElementById('audioPrevBtn'),
+        audioPlayPauseBtn: document.getElementById('audioPlayPauseBtn'),
+        audioNextBtn: document.getElementById('audioNextBtn'),
+        continuousPlayToggle: document.getElementById('continuousPlayToggle'),
+    };
+    console.log("[DEBUG] El object populated.");
+
+    UIManager.showGlobalLoading("Initializing Quran Vision...");
+    try {
+        await initDB(); 
+        await SettingsManager.load(); 
+        UIManager.init();       
+        BookmarkManager.load(); 
+        NotesManager.load();    
+        tilawatAddon_Manager.init(); // Initialize the addon
+        await DataManager.checkAndLoadInitialData(); 
+    } catch (error) {
+        console.error("[DEBUG] Critical error during app initialization:", error);
+        if (El.initialMessage) {
+            El.initialMessage.textContent = "A critical error occurred. Please refresh or check the console.";
+            El.initialMessage.style.color = "red";
+        }
+        UIManager.hideGlobalLoading();
+    }
+    console.log("[DEBUG] Quran Vision Initialized");
+}
+
+// Ensure this is the only DOMContentLoaded listener for app init
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+    initializeApp(); // DOM already loaded
+}
+
+
+
+</script>

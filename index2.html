@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hifz Companion Offline</title>
+    <meta name="description" content="An offline-first Quran memorization tool using Spaced Repetition System.">
+    <meta name="author" content="Yasin Ullah">
+    <style>
+        @font-face {
+            font-family: 'QuranicFont';
+            src: url('path/to/your/quranic/font.woff2') format('woff2'),
+                 url('path/to/your/quranic/font.woff') format('woff');
+            /* Add other font formats if needed */
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            --primary-color: #4CAF50; /* Green */
+            --secondary-color: #8BC34A; /* Light Green */
+            --background-color: #F1F8E9; /* Very Light Green */
+            --text-color: #333;
+            --arabic-text-color: #004D40; /* Dark Teal */
+            --border-color: #A5D6A7; /* Light Green */
+            --card-background: #E8F5E9; /* Lighter Green */
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --rtl-direction: rtl;
+            --text-align-rtl: right;
+            --text-align-ltr: left;
+        }
+
+        [dir="rtl"] {
+            direction: var(--rtl-direction);
+            text-align: var(--text-align-rtl);
+        }
+
+        [dir="ltr"] {
+            direction: ltr;
+            text-align: var(--text-align-ltr);
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 1rem;
+            max-width: 900px;
+            margin: 1rem auto;
+            width: 100%;
+        }
+
+        .container {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px var(--shadow-color);
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .arabic-text {
+            font-family: 'QuranicFont', 'Arial', sans-serif;
+            font-size: 1.8rem;
+            line-height: 2.5;
+            color: var(--arabic-text-color);
+            text-align: var(--text-align-rtl);
+            direction: var(--rtl-direction);
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-shadow: inset 0 1px 3px var(--shadow-color);
+        }
+
+        .translation-text {
+            font-style: italic;
+            color: #555;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background-color: #f9f9f9;
+            border-left: 3px solid var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .ayah-info {
+            font-size: 0.9rem;
+            color: #777;
+            margin-bottom: 1rem;
+        }
+
+        .review-controls button {
+            margin-right: 10px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-top: 1rem;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 20px;
+            background-color: var(--primary-color);
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            main {
+                padding: 0.5rem;
+                margin: 0.5rem auto;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .arabic-text {
+                font-size: 1.5rem;
+                line-height: 2;
+            }
+
+            input[type="text"],
+            textarea,
+            select {
+                width: calc(100% - 20px);
+            }
+        }
+
+        /* Accessibility (WCAG 2.1 AA) */
+        button:focus,
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Theme - Illuminated Manuscript Inspired */
+        body {
+            background-image: url('path/to/subtle/parchment/texture.jpg'); /* Optional: Add a subtle texture */
+            background-repeat: repeat;
+        }
+
+        .container {
+            border: 1px solid #d4c098; /* Parchment border color */
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.2); /* More pronounced shadow */
+        }
+
+        .arabic-text {
+            border: 2px solid #b8a078; /* Thicker border */
+            background-color: #fff8e1; /* Light parchment color */
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #8B4513; /* SaddleBrown */
+            border-bottom-color: #d4c098;
+        }
+
+        button {
+            background-color: #8B4513;
+        }
+
+        button:hover {
+            background-color: #A0522D; /* Sienna */
+        }
+
+        .progress-bar {
+            background-color: #8B4513;
+        }
+
+        /* Ensure sufficient contrast */
+        body { color: #333; }
+        h2 { color: #8B4513; }
+        label { color: #333; }
+        .arabic-text { color: #004D40; }
+        .translation-text { color: #555; }
+        .ayah-info { color: #777; }
+        button { color: white; }
+        button:hover { color: white; }
+        .progress-bar { color: white; }
+        .modal-content { background-color: #fefefe; color: #333; }
+        .close { color: #aaa; }
+        .close:hover, .close:focus { color: black; }
+        footer { color: #555; }
+
+    </style>
+</head>
+<body dir="ltr">
+    <header>
+        <h1>Hifz Companion Offline</h1>
+    </header>
+
+    <main>
+        <div class="container">
+            <h2>Add New Ayah</h2>
+            <label for="surah-name">Surah Name:</label>
+            <input type="text" id="surah-name" required>
+
+            <label for="ayah-number">Ayah Number:</label>
+            <input type="number" id="ayah-number" min="1" required>
+
+            <label for="juz-number">Juz Number:</label>
+            <input type="number" id="juz-number" min="1" max="30" required>
+
+            <label for="arabic-text">Arabic Text:</label>
+            <textarea id="arabic-text" dir="rtl" required></textarea>
+
+            <label for="translation-text">Translation (Optional):</label>
+            <textarea id="translation-text"></textarea>
+
+            <label for="audio-file">Upload Audio (Optional):</label>
+            <input type="file" id="audio-file" accept="audio/*">
+
+            <button id="add-ayah-btn">Add Ayah</button>
+        </div>
+
+        <div class="container">
+            <h2>Review Ayahs</h2>
+            <div id="review-ayah-display" class="hidden">
+                <div class="ayah-info">
+                    <span id="review-surah-ayah"></span> - Juz <span id="review-juz"></span>
+                </div>
+                <div id="review-arabic-text" class="arabic-text" dir="rtl"></div>
+                <div id="review-translation-text" class="translation-text hidden"></div>
+                <audio id="review-audio" controls class="hidden"></audio>
+
+                <div class="review-controls">
+                    <button id="show-translation-btn">Show Translation</button>
+                    <button id="show-arabic-btn" class="hidden">Show Arabic</button>
+                    <button id="play-audio-btn" class="hidden">Play Audio</button>
+                    <div id="difficulty-rating" class="hidden">
+                        <p>How well did you recall?</p>
+                        <button data-difficulty="1">Again (1 min)</button>
+                        <button data-difficulty="2">Hard (10 min)</button>
+                        <button data-difficulty="3">Good (1 day)</button>
+                        <button data-difficulty="4">Easy (4 days)</button>
+                    </div>
+                </div>
+            </div>
+            <div id="no-ayahs-to-review">
+                <p>No Ayahs scheduled for review today. Keep adding more!</p>
+            </div>
+            <button id="start-review-btn">Start Review</button>
+        </div>
+
+        <div class="container">
+            <h2>Memorization Progress</h2>
+            <div id="progress-display">
+                <!-- Progress will be displayed here -->
+            </div>
+        </div>
+
+        <div class="container">
+            <h2>Test Mode</h2>
+            <div id="test-mode-controls">
+                <label for="test-surah-name">Surah Name (Optional):</label>
+                <input type="text" id="test-surah-name">
+                <label for="test-ayah-number">Ayah Number (Optional):</label>
+                <input type="number" id="test-ayah-number" min="1">
+                <button id="start-test-btn">Start Test</button>
+            </div>
+            <div id="test-ayah-display" class="hidden">
+                 <div class="ayah-info">
+                    <span id="test-surah-ayah"></span> - Juz <span id="test-juz"></span>
+                </div>
+                <div id="test-prompt" class="translation-text">Recite/Write the Arabic for the Ayah above.</div>
+                <textarea id="test-user-input" dir="rtl" placeholder="Write the Arabic text here..."></textarea>
+                <button id="show-correct-ayah-btn">Show Correct Ayah</button>
+                <div id="test-correct-arabic" class="arabic-text hidden" dir="rtl"></div>
+                <button id="next-test-ayah-btn" class="hidden">Next Ayah</button>
+            </div>
+             <div id="no-ayahs-for-test" class="hidden">
+                <p>No Ayahs available for testing. Add some first!</p>
+            </div>
+        </div>
+
+         <div class="container">
+            <h2>Notes</h2>
+            <label for="note-surah-name">Surah Name:</label>
+            <input type="text" id="note-surah-name">
+            <label for="note-ayah-number">Ayah Number:</label>
+            <input type="number" id="note-ayah-number" min="1">
+            <button id="load-note-btn">Load Note</button>
+            <textarea id="ayah-note" placeholder="Write notes for this Ayah here..."></textarea>
+            <button id="save-note-btn">Save Note</button>
+        </div>
+
+        <div class="container">
+            <h2>Backup and Restore</h2>
+            <button id="backup-data-btn">Backup Data</button>
+            <input type="file" id="restore-file-input" accept=".json" class="hidden">
+            <button id="restore-data-btn">Restore Data</button>
+            <p id="restore-status"></p>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>© 2023 Hifz Companion Offline. Developed by Yasin Ullah.</p>
+    </footer>
+
+    <!-- The Modal for confirmation/messages -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <p id="modal-message"></p>
+            <button id="modal-confirm-btn" class="hidden">Confirm</button>
+            <button id="modal-cancel-btn" class="hidden">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // IndexedDB Setup
+        const DB_NAME = 'HifzCompanionDB';
+        const DB_VERSION = 1;
+        const AYAH_STORE_NAME = 'ayahs';
+        const NOTE_STORE_NAME = 'notes';
+        let db;
+
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+        request.onerror = function(event) {
+            console.error("IndexedDB error:", event.target.errorCode);
+            alert("Error opening database. Your data might not be saved.");
+        };
+
+        request.onupgradeneeded = function(event) {
+            db = event.target.result;
+            if (!db.objectStoreNames.contains(AYAH_STORE_NAME)) {
+                const ayahStore = db.createObjectStore(AYAH_STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                ayahStore.createIndex('surahAyah', ['surahName', 'ayahNumber'], { unique: true });
+                ayahStore.createIndex('nextReview', 'nextReview');
+                ayahStore.createIndex('juzNumber', 'juzNumber');
+            }
+             if (!db.objectStoreNames.contains(NOTE_STORE_NAME)) {
+                const noteStore = db.createObjectStore(NOTE_STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                noteStore.createIndex('surahAyah', ['surahName', 'ayahNumber'], { unique: true });
+            }
+        };
+
+        request.onsuccess = function(event) {
+            db = event.target.result;
+            console.log("Database opened successfully");
+            loadProgress(); // Load progress on startup
+            // Check for Ayahs to review on startup
+            checkAyahsToReview();
+        };
+
+        // Helper function to get a transaction
+        function getTransaction(storeName, mode) {
+            const transaction = db.transaction(storeName, mode);
+            transaction.onerror = (event) => console.error(`Transaction error on ${storeName}:`, event.target.errorCode);
+            return transaction;
+        }
+
+        // Add Ayah Functionality
+        const addAyahBtn = document.getElementById('add-ayah-btn');
+        const surahNameInput = document.getElementById('surah-name');
+        const ayahNumberInput = document.getElementById('ayah-number');
+        const juzNumberInput = document.getElementById('juz-number');
+        const arabicTextInput = document.getElementById('arabic-text');
+        const translationTextInput = document.getElementById('translation-text');
+        const audioFileInput = document.getElementById('audio-file');
+
+        addAyahBtn.addEventListener('click', async () => {
+            const surahName = surahNameInput.value.trim();
+            const ayahNumber = parseInt(ayahNumberInput.value, 10);
+            const juzNumber = parseInt(juzNumberInput.value, 10);
+            const arabicText = arabicTextInput.value.trim();
+            const translationText = translationTextInput.value.trim();
+            const audioFile = audioFileInput.files[0];
+            let audioBlob = null;
+
+            if (!surahName || !ayahNumber || !juzNumber || !arabicText) {
+                showMessageModal("Please fill in Surah Name, Ayah Number, Juz Number, and Arabic Text.");
+                return;
+            }
+
+            if (audioFile) {
+                try {
+                    audioBlob = await fileToBlob(audioFile);
+                } catch (error) {
+                    console.error("Error reading audio file:", error);
+                    showMessageModal("Error reading audio file. Please try again.");
+                    return;
+                }
+            }
+
+            const transaction = getTransaction(AYAH_STORE_NAME, 'readwrite');
+            const store = transaction.objectStore(AYAH_STORE_NAME);
+
+            const newAyah = {
+                surahName: surahName,
+                ayahNumber: ayahNumber,
+                juzNumber: juzNumber,
+                arabicText: arabicText,
+                translationText: translationText,
+                audioBlob: audioBlob,
+                addedDate: new Date(),
+                nextReview: new Date(), // Schedule for immediate review
+                interval: 0, // SRS interval in days
+                repetition: 0, // Number of successful repetitions
+                easeFactor: 2.5 // SRS ease factor
+            };
+
+            const request = store.add(newAyah);
+
+            request.onsuccess = () => {
+                showMessageModal("Ayah added successfully!");
+                // Clear form
+                surahNameInput.value = '';
+                ayahNumberInput.value = '';
+                juzNumberInput.value = '';
+                arabicTextInput.value = '';
+                translationTextInput.value = '';
+                audioFileInput.value = ''; // Clear file input
+                loadProgress(); // Update progress display
+                 checkAyahsToReview(); // Check if new ayah is due for review
+            };
+
+            request.onerror = (event) => {
+                 if (event.target.error.name === 'ConstraintError') {
+                    showMessageModal(`Ayah ${surahName}:${ayahNumber} already exists.`);
+                } else {
+                    console.error("Error adding Ayah:", event.target.error);
+                    showMessageModal("Error adding Ayah. Please try again.");
+                }
+            };
+        });
+
+        function fileToBlob(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    resolve(new Blob([reader.result], { type: file.type }));
+                };
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Review Ayahs Functionality (SRS)
+        const startReviewBtn = document.getElementById('start-review-btn');
+        const reviewAyahDisplay = document.getElementById('review-ayah-display');
+        const reviewSurahAyahSpan = document.getElementById('review-surah-ayah');
+        const reviewJuzSpan = document.getElementById('review-juz');
+        const reviewArabicTextDiv = document.getElementById('review-arabic-text');
+        const reviewTranslationTextDiv = document.getElementById('review-translation-text');
+        const reviewAudio = document.getElementById('review-audio');
+        const showTranslationBtn = document.getElementById('show-translation-btn');
+        const showArabicBtn = document.getElementById('show-arabic-btn');
+        const playAudioBtn = document.getElementById('play-audio-btn');
+        const difficultyRatingDiv = document.getElementById('difficulty-rating');
+        const noAyahsToReviewDiv = document.getElementById('no-ayahs-to-review');
+
+        let currentReviewAyah = null;
+        let reviewQueue = [];
+
+        startReviewBtn.addEventListener('click', startReviewSession);
+        showTranslationBtn.addEventListener('click', () => {
+            reviewTranslationTextDiv.classList.remove('hidden');
+            showTranslationBtn.classList.add('hidden');
+            showArabicBtn.classList.remove('hidden');
+            difficultyRatingDiv.classList.remove('hidden');
+        });
+         showArabicBtn.addEventListener('click', () => {
+            reviewArabicTextDiv.classList.remove('hidden');
+            reviewTranslationTextDiv.classList.add('hidden');
+            showArabicBtn.classList.add('hidden');
+            showTranslationBtn.classList.remove('hidden');
+        });
+        playAudioBtn.addEventListener('click', () => {
+             if (reviewAudio.src) {
+                reviewAudio.play();
+            }
+        });
+        difficultyRatingDiv.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const difficulty = parseInt(event.target.dataset.difficulty, 10);
+                rateAyah(difficulty);
+            });
+        });
+
+        async function checkAyahsToReview() {
+             if (!db) return;
+             const transaction = getTransaction(AYAH_STORE_NAME, 'readonly');
+             const store = transaction.objectStore(AYAH_STORE_NAME);
+             const index = store.index('nextReview');
+             const today = new Date();
+             today.setHours(0, 0, 0, 0); // Compare against the start of the day
+
+             const range = IDBKeyRange.upperBound(today.getTime());
+
+             const request = index.getAll(range);
+
+             request.onsuccess = (event) => {
+                const ayahsDue = event.target.result;
+                if (ayahsDue.length > 0) {
+                    noAyahsToReviewDiv.classList.add('hidden');
+                    startReviewBtn.classList.remove('hidden');
+                } else {
+                    noAyahsToReviewDiv.classList.remove('hidden');
+                    startReviewBtn.classList.add('hidden');
+                }
+             };
+        }
+
+
+        async function startReviewSession() {
+            if (!db) {
+                showMessageModal("Database not ready. Please try again.");
+                return;
+            }
+
+            const transaction = getTransaction(AYAH_STORE_NAME, 'readonly');
+            const store = transaction.objectStore(AYAH_STORE_NAME);
+            const index = store.index('nextReview');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const range = IDBKeyRange.upperBound(today.getTime());
+
+            const request = index.getAll(range);
+
+            request.onsuccess = (event) => {
+                reviewQueue = event.target.result;
+                if (reviewQueue.length > 0) {
+                    shuffleArray(reviewQueue); // Shuffle for better recall
+                    displayNextReviewAyah();
+                    reviewAyahDisplay.classList.remove('hidden');
+                    startReviewBtn.classList.add('hidden');
+                    noAyahsToReviewDiv.classList.add('hidden');
+                } else {
+                    showMessageModal("No Ayahs scheduled for review today. Keep adding more!");
+                    reviewAyahDisplay.classList.add('hidden');
+                    startReviewBtn.classList.remove('hidden');
+                    noAyahsToReviewDiv.classList.remove('hidden');
+                }
+            };
+
+             request.onerror = (event) => {
+                console.error("Error fetching Ayahs for review:", event.target.error);
+                showMessageModal("Error loading Ayahs for review.");
+            };
+        }
+
+        function displayNextReviewAyah() {
+            if (reviewQueue.length === 0) {
+                showMessageModal("Review session complete! Well done.");
+                reviewAyahDisplay.classList.add('hidden');
+                startReviewBtn.classList.remove('hidden');
+                checkAyahsToReview(); // Re-check for any new ayahs due
+                return;
+            }
+
+            currentReviewAyah = reviewQueue.shift();
+
+            reviewSurahAyahSpan.textContent = `${currentReviewAyah.surahName}:${currentReviewAyah.ayahNumber}`;
+            reviewJuzSpan.textContent = currentReviewAyah.juzNumber;
+            reviewArabicTextDiv.textContent = currentReviewAyah.arabicText;
+            reviewTranslationTextDiv.textContent = currentReviewAyah.translationText || 'No translation available.';
+
+            // Reset display state
+            reviewArabicTextDiv.classList.remove('hidden');
+            reviewTranslationTextDiv.classList.add('hidden');
+            showTranslationBtn.classList.remove('hidden');
+            showArabicBtn.classList.add('hidden');
+            difficultyRatingDiv.classList.add('hidden');
+
+            // Handle audio
+            if (currentReviewAyah.audioBlob) {
+                const audioUrl = URL.createObjectURL(currentReviewAyah.audioBlob);
+                reviewAudio.src = audioUrl;
+                reviewAudio.classList.remove('hidden');
+                playAudioBtn.classList.remove('hidden');
+                 // Clean up previous object URL if any
+                if (reviewAudio.dataset.oldUrl) {
+                    URL.revokeObjectURL(reviewAudio.dataset.oldUrl);
+                }
+                reviewAudio.dataset.oldUrl = audioUrl;
+            } else {
+                reviewAudio.removeAttribute('src');
+                reviewAudio.classList.add('hidden');
+                playAudioBtn.classList.add('hidden');
+                 if (reviewAudio.dataset.oldUrl) {
+                    URL.revokeObjectURL(reviewAudio.dataset.oldUrl);
+                    delete reviewAudio.dataset.oldUrl;
+                }
+            }
+        }
+
+        async function rateAyah(difficulty) {
+            if (!currentReviewAyah) return;
+
+            const q = difficulty; // Quality of recall (1-4)
+            let { interval, repetition, easeFactor } = currentReviewAyah;
+
+            if (q >= 3) { // Successful recall (Good or Easy)
+                repetition++;
+                if (repetition === 1) {
+                    interval = 1;
+                } else if (repetition === 2) {
+                    interval = 6;
+                } else {
+                    interval = Math.round(interval * easeFactor);
+                }
+                easeFactor = easeFactor + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+                if (easeFactor < 1.3) easeFactor = 1.3; // Minimum ease factor
+            } else { // Failed recall (Again or Hard)
+                repetition = 0;
+                interval = 1;
+            }
+
+            const nextReviewDate = new Date();
+            nextReviewDate.setDate(nextReviewDate.getDate() + interval);
+            nextReviewDate.setHours(0, 0, 0, 0); // Schedule for the start of the day
+
+            currentReviewAyah.interval = interval;
+            currentReviewAyah.repetition = repetition;
+            currentReviewAyah.easeFactor = easeFactor;
+            currentReviewAyah.nextReview = nextReviewDate;
+
+            const transaction = getTransaction(AYAH_STORE_NAME, 'readwrite');
+            const store = transaction.objectStore(AYAH_STORE_NAME);
+
+            const request = store.put(currentReviewAyah);
+
+            request.onsuccess = () => {
+                console.log(`Ayah ${currentReviewAyah.surahName}:${currentReviewAyah.ayahNumber} updated. Next review: ${nextReviewDate.toLocaleDateString()}`);
+                displayNextReviewAyah(); // Move to the next Ayah in the queue
+                loadProgress(); // Update progress display
+            };
+
+            request.onerror = (event) => {
+                console.error("Error updating Ayah for SRS:", event.target.error);
+                showMessageModal("Error saving review progress.");
+                 // Optionally, add the ayah back to the queue if saving failed
+                 reviewQueue.unshift(currentReviewAyah);
+            };
+        }
+
+        // Utility function to shuffle an array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+            return array;
+        }
+
+        // Progress Tracking
+        const progressDisplayDiv = document.getElementById('progress-display');
+
+        async function loadProgress() {
+            if (!db) return;
+
+            const transaction = getTransaction(AYAH_STORE_NAME, 'readonly');
+            const store = transaction.objectStore(AYAH_STORE_NAME);
+            const request = store.getAll();
+
+            request.onsuccess = (event) => {
+                const allAyahs = event.target.result;
+                displayProgress(allAyahs);
+            };
+
+             request.onerror = (event) => {
+                console.error("Error loading progress:", event.target.error);
+                progressDisplayDiv.innerHTML = "<p>Error loading progress.</p>";
+            };
+        }
+
+        function displayProgress(ayahs) {
+            if (ayahs.length === 0) {
+                progressDisplayDiv.innerHTML = "<p>Add Ayahs to see your progress.</p>";
+                return;
+            }
+
+            const totalAyahs = ayahs.length;
+            const masteredAyahs = ayahs.filter(ayah => ayah.repetition >= 5).length; // Define "mastered" (e.g., 5 successful repetitions)
+            const dueToday = ayahs.filter(ayah => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                return ayah.nextReview <= today;
+            }).length;
+
+            const progressPercentage = totalAyahs > 0 ? (masteredAyahs / totalAyahs) * 100 : 0;
+
+            let html = `
+                <p>Total Ayahs Added: ${totalAyahs}</p>
+                <p>Ayahs Mastered: ${masteredAyahs}</p>
+                <p>Ayahs Due for Review Today: ${dueToday}</p>
+                <p>Overall Progress:</p>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: ${progressPercentage.toFixed(1)}%;">${progressPercentage.toFixed(1)}%</div>
+                </div>
+                <h3>Progress by Juz:</h3>
+                <ul style="list-style: none; padding: 0;">
+            `;
+
+            const progressByJuz = ayahs.reduce((acc, ayah) => {
+                const juz = ayah.juzNumber;
+                if (!acc[juz]) {
+                    acc[juz] = { total: 0, mastered: 0 };
+                }
+                acc[juz].total++;
+                if (ayah.repetition >= 5) {
+                    acc[juz].mastered++;
+                }
+                return acc;
+            }, {});
+
+             // Sort Juz numbers
+            const sortedJuz = Object.keys(progressByJuz).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+
+            sortedJuz.forEach(juz => {
+                const juzData = progressByJuz[juz];
+                const juzPercentage = juzData.total > 0 ? (juzData.mastered / juzData.total) * 100 : 0;
+                html += `
+                    <li>
+                        Juz ${juz}: ${juzData.mastered}/${juzData.total} mastered
+                        <div class="progress-bar-container" style="height: 15px; margin-top: 5px;">
+                            <div class="progress-bar" style="width: ${juzPercentage.toFixed(1)}%; height: 100%; font-size: 0.8rem;">${juzPercentage.toFixed(1)}%</div>
+                        </div>
+                    </li>
+                `;
+            });
+
+             html += `</ul>`;
+
+             // Progress by Surah (Optional, can be added similarly)
+
+            progressDisplayDiv.innerHTML = html;
+        }
+
+        // Test Mode
+        const startTestBtn = document.getElementById('start-test-btn');
+        const testModeControlsDiv = document.getElementById('test-mode-controls');
+        const testAyahDisplayDiv = document.getElementById('test-ayah-display');
+        const testSurahAyahSpan = document.getElementById('test-surah-ayah');
+        const testJuzSpan = document.getElementById('test-juz');
+        const testPromptDiv = document.getElementById('test-prompt');
+        const testUserInput = document.getElementById('test-user-input');
+        const showCorrectAyahBtn = document.getElementById('show-correct-ayah-btn');
+        const testCorrectArabicDiv = document.getElementById('test-correct-arabic');
+        const nextTestAyahBtn = document.getElementById('next-test-ayah-btn');
+        const noAyahsForTestDiv = document.getElementById('no-ayahs-for-test');
+        const testSurahNameInput = document.getElementById('test-surah-name');
+        const testAyahNumberInput = document.getElementById('test-ayah-number');
+
+
+        let testAyahs = [];
+        let currentTestAyah = null;
+
+        startTestBtn.addEventListener('click', startTestMode);
+        showCorrectAyahBtn.addEventListener('click', showCorrectAyah);
+        nextTestAyahBtn.addEventListener('click', displayNextTestAyah);
+
+        async function startTestMode() {
+             if (!db) {
+                showMessageModal("Database not ready. Please try again.");
+                return;
+            }
+
+            const surahFilter = testSurahNameInput.value.trim();
+            const ayahFilter = parseInt(testAyahNumberInput.value, 10);
+
+            const transaction = getTransaction(AYAH_STORE_NAME, 'readonly');
+            const store = transaction.objectStore(AYAH_STORE_NAME);
+            let request;
+
+            if (surahFilter && ayahFilter) {
+                 // Test a specific Ayah
+                 const index = store.index('surahAyah');
+                 request = index.get([surahFilter, ayahFilter]);
+                 request.onsuccess = (event) => {
+                    const ayah = event.target.result;
+                    if (ayah) {
+                        testAyahs = [ayah];
+                        setupTestDisplay();
+                        displayNextTestAyah();
+                    } else {
+                        showMessageModal(`Ayah ${surahFilter}:${ayahFilter} not found.`);
+                         noAyahsForTestDiv.classList.remove('hidden');
+                         testAyahDisplayDiv.classList.add('hidden');
+                    }
+                 };
+            } else {
+                // Test all Ayahs
+                request = store.getAll();
+                 request.onsuccess = (event) => {
+                    testAyahs = event.target.result;
+                     if (testAyahs.length > 0) {
+                        shuffleArray(testAyahs);
+                        setupTestDisplay();
+                        displayNextTestAyah();
+                    } else {
+                        showMessageModal("No Ayahs added yet. Add some to start testing.");
+                        noAyahsForTestDiv.classList.remove('hidden');
+                        testAyahDisplayDiv.classList.add('hidden');
+                    }
+                 };
+            }
+
+             request.onerror = (event) => {
+                console.error("Error fetching Ayahs for test:", event.target.error);
+                showMessageModal("Error loading Ayahs for test.");
+                 noAyahsForTestDiv.classList.remove('hidden');
+                 testAyahDisplayDiv.classList.add('hidden');
+            };
+        }
+
+        function setupTestDisplay() {
+             testModeControlsDiv.classList.add('hidden');
+             testAyahDisplayDiv.classList.remove('hidden');
+             noAyahsForTestDiv.classList.add('hidden');
+        }
+
+        function displayNextTestAyah() {
+            if (testAyahs.length === 0) {
+                showMessageModal("Test session complete! Well done.");
+                testAyahDisplayDiv.classList.add('hidden');
+                testModeControlsDiv.classList.remove('hidden');
+                // Reset test inputs
+                testSurahNameInput.value = '';
+                testAyahNumberInput.value = '';
+                return;
+            }
+
+            currentTestAyah = testAyahs.shift();
+
+            testSurahAyahSpan.textContent = `${currentTestAyah.surahName}:${currentTestAyah.ayahNumber}`;
+            testJuzSpan.textContent = currentTestAyah.juzNumber;
+            testPromptDiv.textContent = `Recite/Write the Arabic for ${currentTestAyah.surahName}:${currentTestAyah.ayahNumber}.`;
+            testUserInput.value = '';
+            testCorrectArabicDiv.textContent = currentTestAyah.arabicText;
+
+            // Reset display state
+            testUserInput.classList.remove('hidden');
+            showCorrectAyahBtn.classList.remove('hidden');
+            testCorrectArabicDiv.classList.add('hidden');
+            nextTestAyahBtn.classList.add('hidden');
+        }
+
+        function showCorrectAyah() {
+            testUserInput.classList.add('hidden');
+            showCorrectAyahBtn.classList.add('hidden');
+            testCorrectArabicDiv.classList.remove('hidden');
+            nextTestAyahBtn.classList.remove('hidden');
+        }
+
+        // Notes Functionality
+        const noteSurahNameInput = document.getElementById('note-surah-name');
+        const noteAyahNumberInput = document.getElementById('note-ayah-number');
+        const loadNoteBtn = document.getElementById('load-note-btn');
+        const ayahNoteTextarea = document.getElementById('ayah-note');
+        const saveNoteBtn = document.getElementById('save-note-btn');
+
+        let currentNoteAyahId = null; // To store the ID of the ayah whose note is being edited
+
+        loadNoteBtn.addEventListener('click', loadAyahNote);
+        saveNoteBtn.addEventListener('click', saveAyahNote);
+
+        async function loadAyahNote() {
+             if (!db) {
+                showMessageModal("Database not ready. Please try again.");
+                return;
+            }
+
+            const surahName = noteSurahNameInput.value.trim();
+            const ayahNumber = parseInt(noteAyahNumberInput.value, 10);
+
+            if (!surahName || !ayahNumber) {
+                showMessageModal("Please enter Surah Name and Ayah Number to load a note.");
+                return;
+            }
+
+            const transaction = getTransaction(NOTE_STORE_NAME, 'readonly');
+            const store = transaction.objectStore(NOTE_STORE_NAME);
+            const index = store.index('surahAyah');
+
+            const request = index.get([surahName, ayahNumber]);
+
+            request.onsuccess = (event) => {
+                const note = event.target.result;
+                if (note) {
+                    ayahNoteTextarea.value = note.text;
+                    currentNoteAyahId = note.id;
+                    showMessageModal(`Note loaded for ${surahName}:${ayahNumber}.`);
+                } else {
+                    ayahNoteTextarea.value = '';
+                    currentNoteAyahId = null; // No existing note
+                    showMessageModal(`No note found for ${surahName}:${ayahNumber}. You can add one.`);
+                }
+            };
+
+             request.onerror = (event) => {
+                console.error("Error loading note:", event.target.error);
+                showMessageModal("Error loading note.");
+            };
+        }
+
+        async function saveAyahNote() {
+             if (!db) {
+                showMessageModal("Database not ready. Please try again.");
+                return;
+            }
+
+            const surahName = noteSurahNameInput.value.trim();
+            const ayahNumber = parseInt(noteAyahNumberInput.value, 10);
+            const noteText = ayahNoteTextarea.value.trim();
+
+             if (!surahName || !ayahNumber) {
+                showMessageModal("Please enter Surah Name and Ayah Number to save a note.");
+                return;
+            }
+
+            const transaction = getTransaction(NOTE_STORE_NAME, 'readwrite');
+            const store = transaction.objectStore(NOTE_STORE_NAME);
+
+            let noteData = {
+                surahName: surahName,
+                ayahNumber: ayahNumber,
+                text: noteText,
+                updatedDate: new Date()
+            };
+
+            if (currentNoteAyahId !== null) {
+                // Update existing note
+                noteData.id = currentNoteAyahId;
+            } else {
+                 // Check if an ayah with this surah/ayah exists in the ayah store first (optional but good practice)
+                 const ayahTransaction = getTransaction(AYAH_STORE_NAME, 'readonly');
+                 const ayahStore = ayahTransaction.objectStore(AYAH_STORE_NAME);
+                 const ayahIndex = ayahStore.index('surahAyah');
+                 const ayahRequest = ayahIndex.get([surahName, ayahNumber]);
+
+                 ayahRequest.onsuccess = (event) => {
+                     if (!event.target.result) {
+                         showMessageModal(`Ayah ${surahName}:${ayahNumber} does not exist in your memorized list. Add it first.`);
+                         return;
+                     }
+                     // Add new note
+                     const addRequest = store.add(noteData);
+                     addRequest.onsuccess = (event) => {
+                        currentNoteAyahId = event.target.result; // Store the new ID
+                        showMessageModal(`Note saved for ${surahName}:${ayahNumber}.`);
+                     };
+                     addRequest.onerror = (event) => {
+                        console.error("Error adding note:", event.target.error);
+                        showMessageModal("Error saving note.");
+                     };
+                 };
+                 ayahRequest.onerror = (event) => {
+                     console.error("Error checking ayah existence:", event.target.error);
+                     showMessageModal("Error checking ayah existence.");
+                 };
+                 return; // Exit saveNoteBtn handler here to wait for ayah check
+            }
+
+
+            const request = store.put(noteData); // Use put for both add and update
+
+            request.onsuccess = () => {
+                showMessageModal(`Note saved for ${surahName}:${ayahNumber}.`);
+            };
+
+            request.onerror = (event) => {
+                console.error("Error saving note:", event.target.error);
+                showMessageModal("Error saving note.");
+            };
+        }
+
+
+        // Backup and Restore
+        const backupDataBtn = document.getElementById('backup-data-btn');
+        const restoreFileInput = document.getElementById('restore-file-input');
+        const restoreDataBtn = document.getElementById('restore-data-btn');
+        const restoreStatusP = document.getElementById('restore-status');
+
+        backupDataBtn.addEventListener('click', backupData);
+        restoreDataBtn.addEventListener('click', () => restoreFileInput.click());
+        restoreFileInput.addEventListener('change', restoreData);
+
+        async function backupData() {
+             if (!db) {
+                showMessageModal("Database not ready. Cannot backup.");
+                return;
+            }
+
+            try {
+                const transactionAyahs = getTransaction(AYAH_STORE_NAME, 'readonly');
+                const storeAyahs = transactionAyahs.objectStore(AYAH_STORE_NAME);
+                const allAyahs = await getAllFromStore(storeAyahs);
+
+                 const transactionNotes = getTransaction(NOTE_STORE_NAME, 'readonly');
+                const storeNotes = transactionNotes.objectStore(NOTE_STORE_NAME);
+                const allNotes = await getAllFromStore(storeNotes);
+
+                const backupData = {
+                    ayahs: allAyahs,
+                    notes: allNotes,
+                    timestamp: new Date().toISOString(),
+                    version: DB_VERSION
+                };
+
+                const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `hifz_companion_backup_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                URL.revokeObjectURL(url);
+                showMessageModal("Backup created successfully!");
+
+            } catch (error) {
+                console.error("Backup failed:", error);
+                showMessageModal("Backup failed. See console for details.");
+            }
+        }
+
+        function getAllFromStore(store) {
+            return new Promise((resolve, reject) => {
+                const request = store.getAll();
+                request.onsuccess = (event) => resolve(event.target.result);
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        async function restoreData(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                restoreStatusP.textContent = "No file selected.";
+                return;
+            }
+
+            restoreStatusP.textContent = "Reading file...";
+
+            try {
+                const fileContent = await readFileAsText(file);
+                const backupData = JSON.parse(fileContent);
+
+                if (!backupData || !backupData.ayahs || !Array.isArray(backupData.ayahs) || !backupData.notes || !Array.isArray(backupData.notes)) {
+                    throw new Error("Invalid backup file format.");
+                }
+
+                 // Optional: Check backup version compatibility
+                 if (backupData.version !== DB_VERSION) {
+                     showMessageModal(`Warning: Backup file version (${backupData.version}) does not match current app version (${DB_VERSION}). Restore might have issues.`);
+                     // Proceed with restore, but warn the user
+                 }
+
+
+                showMessageModal("Restoring data... This may take a moment.", true); // Show modal, don't auto-close
+
+                const transaction = getTransaction([AYAH_STORE_NAME, NOTE_STORE_NAME], 'readwrite');
+                const ayahStore = transaction.objectStore(AYAH_STORE_NAME);
+                const noteStore = transaction.objectStore(NOTE_STORE_NAME);
+
+                // Clear existing data (optional, but safer for a full restore)
+                await clearStore(ayahStore);
+                await clearStore(noteStore);
+
+                // Add data from backup
+                for (const ayah of backupData.ayahs) {
+                    // Ensure dates are Date objects, not strings
+                    if (ayah.addedDate) ayah.addedDate = new Date(ayah.addedDate);
+                    if (ayah.nextReview) ayah.nextReview = new Date(ayah.nextReview);
+                    // Handle audioBlob - it will be null if not backed up as text, which is expected
+                    // If audio was backed up as base64, you'd need to convert it back to Blob here
+                    // For simplicity, we assume audioBlobs are not directly in the JSON backup
+                    // If you need audio backup, you'd need a more complex format (e.g., zip)
+                    delete ayah.id; // Let IndexedDB assign new IDs
+                    await addDataToStore(ayahStore, ayah);
+                }
+
+                 for (const note of backupData.notes) {
+                     if (note.updatedDate) note.updatedDate = new Date(note.updatedDate);
+                     delete note.id; // Let IndexedDB assign new IDs
+                     await addDataToStore(noteStore, note);
+                 }
+
+
+                transaction.oncomplete = () => {
+                    restoreStatusP.textContent = "Restore complete!";
+                    showMessageModal("Restore complete! Please refresh the page.");
+                    loadProgress(); // Update display
+                    checkAyahsToReview(); // Update review status
+                };
+
+                transaction.onerror = (event) => {
+                    console.error("Restore transaction failed:", event.target.error);
+                    restoreStatusP.textContent = "Restore failed.";
+                    showMessageModal("Restore failed. See console for details.");
+                };
+
+            } catch (error) {
+                console.error("Restore failed:", error);
+                restoreStatusP.textContent = `Restore failed: ${error.message}`;
+                showMessageModal(`Restore failed: ${error.message}`);
+            } finally {
+                 restoreFileInput.value = ''; // Clear the file input
+            }
+        }
+
+        function readFileAsText(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (event) => resolve(event.target.result);
+                reader.onerror = (event) => reject(event.target.error);
+                reader.readAsText(file);
+            });
+        }
+
+        function clearStore(store) {
+             return new Promise((resolve, reject) => {
+                 const request = store.clear();
+                 request.onsuccess = () => resolve();
+                 request.onerror = (event) => reject(event.target.error);
+             });
+        }
+
+         function addDataToStore(store, data) {
+             return new Promise((resolve, reject) => {
+                 const request = store.add(data);
+                 request.onsuccess = () => resolve();
+                 request.onerror = (event) => reject(event.target.error);
+             });
+         }
+
+
+        // Modal Functionality
+        const modal = document.getElementById("myModal");
+        const modalMessage = document.getElementById("modal-message");
+        const modalConfirmBtn = document.getElementById("modal-confirm-btn");
+        const modalCancelBtn = document.getElementById("modal-cancel-btn");
+        const modalCloseSpan = document.getElementsByClassName("close")[0];
+
+        let resolveModalPromise;
+
+        function showMessageModal(message, persistent = false) {
+            modalMessage.textContent = message;
+            modalConfirmBtn.classList.add('hidden');
+            modalCancelBtn.classList.add('hidden');
+            modalCloseSpan.style.display = persistent ? 'none' : 'block'; // Hide close button if persistent
+            modal.style.display = "block";
+
+            if (!persistent) {
+                 // Auto-close after a few seconds if not persistent
+                 setTimeout(() => {
+                     if (modal.style.display === "block" && !modalConfirmBtn.classList.contains('hidden')) {
+                         // Don't auto-close if it turned into a confirmation modal
+                     } else if (modal.style.display === "block") {
+                         modal.style.display = "none";
+                     }
+                 }, 3000); // Close after 3 seconds
+            }
+        }
+
+        function showConfirmModal(message) {
+             return new Promise((resolve) => {
+                 modalMessage.textContent = message;
+                 modalConfirmBtn.classList.remove('hidden');
+                 modalCancelBtn.classList.remove('hidden');
+                 modalCloseSpan.style.display = 'block'; // Always show close for confirm
+                 modal.style.display = "block";
+                 resolveModalPromise = resolve;
+             });
+        }
+
+        modalCloseSpan.onclick = function() {
+            modal.style.display = "none";
+             if (resolveModalPromise) {
+                 resolveModalPromise(false); // Resolve with false if closed without action
+                 resolveModalPromise = null;
+             }
+        }
+
+        modalConfirmBtn.onclick = function() {
+            modal.style.display = "none";
+             if (resolveModalPromise) {
+                 resolveModalPromise(true);
+                 resolveModalPromise = null;
+             }
+        }
+
+         modalCancelBtn.onclick = function() {
+            modal.style.display = "none";
+             if (resolveModalPromise) {
+                 resolveModalPromise(false);
+                 resolveModalPromise = null;
+             }
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+                 if (resolveModalPromise) {
+                     resolveModalPromise(false);
+                     resolveModalPromise = null;
+                 }
+            }
+        }
+
+        // Initial checks on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set default direction based on content (Arabic textareas are RTL)
+            // You might want a language switcher for the whole UI
+            document.body.setAttribute('dir', 'ltr'); // Default LTR for English UI
+        });
+
+
+    </script>
+</body>
+</html>

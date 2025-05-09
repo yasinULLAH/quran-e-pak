@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran Vision</title>
+    <style>
+        /* Basic Reset */
+        body { margin: 0; font-family: sans-serif; line-height: 1.6; }
+        *, *::before, *::after { box-sizing: border-box; }
+
+        /* Fonts */
+        @font-face {
+            font-family: 'Amiri';
+            src: url('https://fonts.gstatic.com/s/amiri/v27/J7SnnpZIResOP4K6SGtE.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Noto Nastaliq Urdu';
+            src: url('https://fonts.gstatic.com/s/notonastaliqurdu/v20/v6-pkHvHzzWaBqrWnF4VTrCEhcv_Xg3lC2CIoA.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        /* Themes */
+        body.theme-light {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        body.theme-dark {
+            background-color: #212529;
+            color: #f8f9fa;
+        }
+        body.theme-green {
+            background-color: #e9f5e9;
+            color: #1a4d2e;
+        }
+        body.theme-sepia {
+            background-color: #f4e7d3;
+            color: #5a4a3a;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        nav {
+            margin-bottom: 20px;
+        }
+
+        .ayah {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .ayah-arabic {
+            font-family: 'Amiri', serif;
+            font-size: 24px;
+            text-align: right;
+            direction: rtl;
+            margin-bottom: 10px;
+        }
+
+        .ayah-urdu {
+            font-family: 'Noto Nastaliq Urdu', serif;
+            font-size: 18px;
+            text-align: right;
+            direction: rtl;
+            margin-top: 10px;
+        }
+
+        .ayah-secondary {
+            font-size: 16px;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .ayah-meta {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .search-results .ayah {
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            background-color: #fff; /* White background for search results */
+        }
+        body.theme-dark .search-results .ayah {
+             background-color: #333;
+             border-color: #555;
+        }
+
+        .highlight {
+            background-color: yellow;
+            padding: 2px 0;
+        }
+        body.theme-dark .highlight {
+            background-color: #ff0;
+            color: #000;
+        }
+
+        /* Controls */
+        select, input[type="text"], button, input[type="file"] {
+            padding: 8px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .settings-panel {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* Audio Player */
+        .audio-player {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .audio-player button {
+            background-color: #28a745;
+        }
+        .audio-player button:hover {
+            background-color: #218838;
+        }
+
+        .currently-playing {
+            background-color: #d4edda; /* Light green highlight */
+        }
+         body.theme-dark .currently-playing {
+            background-color: #1e3c24;
+         }
+
+
+        /* Tilawat Mode Styles (Managed by JS) */
+        .tilawatAddon_container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            color: white;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none; /* Hidden by default */
+            padding: 20px;
+            text-align: center;
+        }
+
+        .tilawatAddon_content {
+            max-width: 800px;
+            margin: 0 auto;
+            font-family: 'Amiri', serif;
+            font-size: 30px; /* Default large font */
+            line-height: 2.5; /* Increased line height */
+            direction: rtl;
+            text-align: right;
+        }
+
+        .tilawatAddon_ayah {
+            margin-bottom: 30px; /* More space between verses */
+        }
+
+        .tilawatAddon_bismillah {
+            font-size: 36px;
+            margin-bottom: 40px;
+            display: block;
+            text-align: center;
+        }
+
+        .tilawatAddon_controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1001;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .tilawatAddon_controls label {
+            color: white;
+            margin-right: 5px;
+        }
+
+        .tilawatAddon_controls select,
+        .tilawatAddon_controls input[type="number"],
+        .tilawatAddon_controls input[type="range"],
+        .tilawatAddon_controls button {
+            padding: 5px;
+            border-radius: 3px;
+            border: none;
+        }
+
+        .tilawatAddon_controls button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+         .tilawatAddon_controls button:hover {
+             background-color: #0056b3;
+         }
+
+
+        .tilawatAddon_nav-buttons {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1002;
+            display: flex;
+            gap: 20px;
+        }
+
+        .tilawatAddon_nav-buttons button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: 1px solid white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+         .tilawatAddon_nav-buttons button:hover {
+             background-color: rgba(255, 255, 255, 0.2);
+         }
+
+
+        .tilawatAddon_toggle-icon {
+            cursor: pointer;
+            font-size: 24px;
+            margin-left: 10px;
+        }
+
+        /* Hide main app UI when Tilawat mode is active */
+        body.tilawat-active .container,
+        body.tilawat-active header:not(.tilawatAddon_header-controls),
+        body.tilawat-active nav,
+        body.tilawat-active .settings-panel,
+        body.tilawat-active .audio-player {
+            display: none;
+        }
+
+        /* Ensure Tilawat controls are visible when active */
+        body.tilawat-active .tilawatAddon_container {
+            display: block;
+        }
+        body.tilawat-active .tilawatAddon_controls {
+             display: flex; /* Use flex for column layout */
+        }
+         body.tilawat-active .tilawatAddon_nav-buttons {
+             display: flex;
+         }
+
+
+    </style>
+</head>
+<body class="theme-light">
+
+    <header>
+        <h1>Quran Vision</h1>
+        <div>
+            <select id="theme-selector">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="green">Green</option>
+                <option value="sepia">Sepia</option>
+            </select>
+            <span id="tilawat-toggle-icon" class="tilawatAddon_toggle-icon" title="Toggle Tilawat Mode">📖</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <label for="surah-selector">Surah:</label>
+            <select id="surah-selector"></select>
+
+            <label for="ayah-selector">Ayah:</label>
+            <select id="ayah-selector"></select>
+
+            <button id="go-to-ayah">Go</button>
+
+            <label for="juz-selector">Juz:</label>
+            <select id="juz-selector"></select>
+            <button id="go-to-juz">Go</button>
+
+            <button id="go-to-last-read">Last Read</button>
+        </nav>
+
+        <div class="search-section">
+            <h2>Search</h2>
+            <input type="text" id="search-input" placeholder="Search Arabic, Urdu, or Secondary">
+            <button id="search-button">Search</button>
+            <div id="search-suggestions"></div>
+            <div id="search-results"></div>
+        </div>
+
+        <div id="quran-display">
+            <!-- Quran content will be loaded here -->
+        </div>
+
+        <div class="audio-player">
+            <label for="reciter-selector">Reciter:</label>
+            <select id="reciter-selector">
+                <!-- Options will be populated by JS -->
+            </select>
+            <button id="play-ayah">Play Ayah</button>
+            <button id="pause-audio">Pause</button>
+            <button id="stop-audio">Stop</button>
+            <button id="prev-ayah">Prev</button>
+            <button id="next-ayah">Next</button>
+            <label><input type="checkbox" id="continuous-play"> Continuous Play</label>
+             <label for="playback-rate">Speed:</label>
+             <select id="playback-rate">
+                 <option value="1.0">1x</option>
+                 <option value="1.25">1.25x</option>
+                 <option value="1.5">1.5x</option>
+                 <option value="0.75">0.75x</option>
+                 <option value="0.5">0.5x</option>
+             </select>
+            <audio id="quran-audio" preload="auto"></audio>
+        </div>
+
+        <div class="settings-panel">
+            <h2>Settings</h2>
+            <div>
+                <label for="arabic-font-size">Arabic Font Size:</label>
+                <input type="range" id="arabic-font-size" min="18" max="40" value="24">
+                <span id="arabic-font-size-value">24px</span>
+            </div>
+            <div>
+                <label for="translation-font-size">Translation Font Size:</label>
+                <input type="range" id="translation-font-size" min="14" max="30" value="18">
+                 <span id="translation-font-size-value">18px</span>
+            </div>
+            <div>
+                <label for="secondary-translation-file">Load Secondary Translation (Text File):</label>
+                <input type="file" id="secondary-translation-file" accept=".txt">
+                <button id="load-secondary-translation">Load</button>
+                <label><input type="checkbox" id="show-secondary-translation"> Show Secondary Translation</label>
+            </div>
+            <div>
+                <h3>Data Management</h3>
+                <button id="backup-data">Backup Data</button>
+                <label for="restore-file">Restore Data (JSON File):</label>
+                <input type="file" id="restore-file" accept=".json">
+                <button id="restore-data">Restore</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Tilawat Mode Container (Managed by JS) -->
+    <div id="tilawatAddon_container" class="tilawatAddon_container">
+        <div id="tilawatAddon_controls" class="tilawatAddon_controls">
+            <label for="tilawatAddon_surah-selector">Surah:</label>
+            <select id="tilawatAddon_surah-selector"></select>
+
+            <label for="tilawatAddon_ayah-selector">Ayah:</label>
+            <select id="tilawatAddon_ayah-selector"></select>
+            <button id="tilawatAddon_go-to-ayah">Go</button>
+
+            <label for="tilawatAddon_lines-per-page">Lines/Chunk:</label>
+            <input type="number" id="tilawatAddon_lines-per-page" min="5" max="50" value="15">
+
+            <label for="tilawatAddon_font-size">Font Size:</label>
+            <input type="range" id="tilawatAddon_font-size" min="20" max="60" value="30">
+             <span id="tilawatAddon_font-size-value">30px</span>
+
+            <label><input type="radio" name="tilawatAddon_view-mode" value="paginated" checked> Paginated</label>
+            <label><input type="radio" name="tilawatAddon_view-mode" value="continuous"> Continuous</label>
+        </div>
+
+        <div id="tilawatAddon_content" class="tilawatAddon_content">
+            <!-- Tilawat content will be loaded here -->
+        </div>
+
+        <div id="tilawatAddon_nav-buttons" class="tilawatAddon_nav-buttons">
+            <button id="tilawatAddon_prev-page">Prev</button>
+            <button id="tilawatAddon_next-page">Next</button>
+        </div>
+    </div>
+
+
+    <script>
+        // Author: Yasin Ullah
+        // Pakistani
+
+        const DB_NAME = 'QuranVisionDB';
+        const DB_VERSION = 1;
+        const STORE_QURAN = 'quran';
+        const STORE_NOTES = 'notes';
+        const STORE_BOOKMARKS = 'bookmarks';
+        const STORE_SETTINGS = 'settings';
+        const DATA_FILE = 'data.AM'; // Local data file name
+
+        let db;
+        let quranData = []; // Array to hold all Ayah objects
+        let secondaryTranslation = {}; // { surah_ayah: translation }
+        let notes = {}; // { surah_ayah: noteText }
+        let bookmarks = {}; // { surah_ayah: true }
+        let settings = {}; // User settings
+
+        const surahNames = [
+            "Al-Fatihah", "Al-Baqarah", "Al-Imran", "An-Nisa", "Al-Ma'idah", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Tawbah", "Yunus",
+            "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra", "Al-Kahf", "Maryam", "Taha",
+            "Al-Anbiya", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan", "Ash-Shu'ara", "An-Naml", "Al-Qasas", "Al-'Ankabut", "Ar-Rum",
+            "Luqman", "As-Sajdah", "Al-Ahzab", "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir",
+            "Fussilat", "Ash-Shura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiyah", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf",
+            "Adh-Dhariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'ah", "Al-Hadid", "Al-Mujadilah", "Al-Hashr", "Al-Mumtahanah",
+            "As-Saff", "Al-Jumu'ah", "Al-Munafiqun", "At-Taghabun", "At-Talaq", "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij",
+            "Nuh", "Al-Jinn", "Al-Muzzammil", "Al-Muddaththir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba", "An-Nazi'at", "'Abasa",
+            "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-A'la", "Al-Ghashiyah", "Al-Fajr", "Al-Balad",
+            "Ash-Shams", "Al-Layl", "Ad-Duha", "Ash-Sharh", "At-Tin", "Al-'Alaq", "Al-Qadr", "Al-Bayyinah", "Az-Zalzalah", "Al-'Adiyat",
+            "Al-Qari'ah", "At-Takathur", "Al-'Asr", "Al-Humazah", "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr",
+            "Al-Masad", "Al-Ikhlas", "Al-Falaq", "An-Nas"
+        ];
+
+        const juzStartAyahs = [
+            { surah: 1, ayah: 1 }, { surah: 2, ayah: 142 }, { surah: 2, ayah: 253 }, { surah: 3, ayah: 93 }, { surah: 4, ayah: 24 },
+            { surah: 4, ayah: 148 }, { surah: 5, ayah: 82 }, { surah: 6, ayah: 111 }, { surah: 7, ayah: 88 }, { surah: 8, ayah: 41 },
+            { surah: 9, ayah: 93 }, { surah: 11, ayah: 6 }, { surah: 12, ayah: 53 }, { surah: 15, ayah: 1 }, { surah: 17, ayah: 1 },
+            { surah: 18, ayah: 75 }, { surah: 21, ayah: 1 }, { surah: 23, ayah: 1 }, { surah: 25, ayah: 21 }, { surah: 27, ayah: 56 },
+            { surah: 29, ayah: 46 }, { surah: 33, ayah: 31 }, { surah: 36, ayah: 22 }, { surah: 39, ayah: 32 }, { surah: 41, ayah: 47 },
+            { surah: 46, ayah: 1 }, { surah: 51, ayah: 31 }, { surah: 58, ayah: 1 }, { surah: 67, ayah: 1 }, { surah: 78, ayah: 1 }
+        ];
+
+        const reciters = {
+            "Abdul Basit Murattal": "Abdul_Basit_Murattal_192kbps",
+            "Mishary Alafasy": "Mishary_Alafasy_128kbps",
+            "Saad Al Ghamdi": "Saad_Al_Ghamdi_128kbps"
+            // Add more reciters here
+        };
+
+        // --- IndexedDB Functions ---
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onupgradeneeded = (event) => {
+                    db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_QURAN)) {
+                        db.createObjectStore(STORE_QURAN, { keyPath: 'id' });
+                    }
+                    if (!db.objectStoreNames.contains(STORE_NOTES)) {
+                        db.createObjectStore(STORE_NOTES, { keyPath: 'id' });
+                    }
+                    if (!db.objectStoreNames.contains(STORE_BOOKMARKS)) {
+                        db.createObjectStore(STORE_BOOKMARKS, { keyPath: 'id' });
+                    }
+                     if (!db.objectStoreNames.contains(STORE_SETTINGS)) {
+                        db.createObjectStore(STORE_SETTINGS, { keyPath: 'id' });
+                    }
+                };
+
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    resolve(db);
+                };
+
+                request.onerror = (event) => {
+                    console.error("IndexedDB error:", event.target.errorCode);
+                    reject("IndexedDB error");
+                };
+            });
+        }
+
+        function addData(storeName, data) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([storeName], 'readwrite');
+                const store = transaction.objectStore(storeName);
+                const request = store.add(data);
+
+                request.onsuccess = () => resolve();
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+         function putData(storeName, data) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([storeName], 'readwrite');
+                const store = transaction.objectStore(storeName);
+                const request = store.put(data); // Use put for update/insert
+
+                request.onsuccess = () => resolve();
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+
+        function getAllData(storeName) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([storeName], 'readonly');
+                const store = transaction.objectStore(storeName);
+                const request = store.getAll();
+
+                request.onsuccess = (event) => resolve(event.target.result);
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+         function getData(storeName, id) {
+             return new Promise((resolve, reject) => {
+                 const transaction = db.transaction([storeName], 'readonly');
+                 const store = transaction.objectStore(storeName);
+                 const request = store.get(id);
+
+                 request.onsuccess = (event) => resolve(event.target.result);
+                 request.onerror = (event) => reject(event.target.error);
+             });
+         }
+
+
+        function clearStore(storeName) {
+             return new Promise((resolve, reject) => {
+                 const transaction = db.transaction([storeName], 'readwrite');
+                 const store = transaction.objectStore(storeName);
+                 const request = store.clear();
+
+                 request.onsuccess = () => resolve();
+                 request.onerror = (event) => reject(event.target.error);
+             });
+         }
+
+
+        // --- Data Loading and Parsing ---
+        async function loadQuranData() {
+            try {
+                quranData = await getAllData(STORE_QURAN);
+                if (quranData.length === 0) {
+                    console.log("No data in IndexedDB, loading from file...");
+                    const response = await fetch(DATA_FILE);
+                    if (!response.ok) throw new Error(`Failed to fetch ${DATA_FILE}`);
+                    const text = await response.text();
+                    const lines = text.split('\n').filter(line => line.trim() !== '');
+
+                    const dataToStore = lines.map((line, index) => {
+                        const parts = line.split(' ترجمہ: ');
+                        const arabic = parts[0].trim();
+                        const rest = parts[1].trim();
+                        const metaMatch = rest.match(/<br\/>س (\d{3}) آ (\d{3})/);
+                        const urdu = rest.replace(/<br\/>س \d{3} آ \d{3}/, '').trim();
+                        const surah = parseInt(metaMatch[1], 10);
+                        const ayah = parseInt(metaMatch[2], 10);
+
+                        return {
+                            id: `${surah}_${ayah}`,
+                            surah: surah,
+                            ayah: ayah,
+                            arabic: arabic,
+                            urdu: urdu
+                        };
+                    });
+
+                    const transaction = db.transaction([STORE_QURAN], 'readwrite');
+                    const store = transaction.objectStore(STORE_QURAN);
+                    dataToStore.forEach(item => store.add(item));
+
+                    await new Promise((resolve, reject) => {
+                        transaction.oncomplete = () => {
+                            console.log("Quran data loaded and stored in IndexedDB.");
+                            quranData = dataToStore; // Update in-memory data
+                            resolve();
+                        };
+                        transaction.onerror = (event) => {
+                            console.error("Error storing data:", event.target.error);
+                            reject(event.target.error);
+                        };
+                    });
+                } else {
+                    console.log("Quran data loaded from IndexedDB.");
+                }
+                populateSelectors();
+                loadUserSettings(); // Load settings after data is ready
+            } catch (error) {
+                console.error("Error loading Quran data:", error);
+                document.getElementById('quran-display').innerHTML = "<p>Error loading Quran data. Please check console.</p>";
+            }
+        }
+
+        async function loadSecondaryTranslation(file) {
+            try {
+                const text = await file.text();
+                const lines = text.split('\n').filter(line => line.trim() !== '');
+                secondaryTranslation = {};
+                lines.forEach(line => {
+                    const parts = line.split(':');
+                    if (parts.length >= 2) {
+                        const key = parts[0].trim(); // e.g., "1_1"
+                        const translation = parts.slice(1).join(':').trim();
+                        secondaryTranslation[key] = translation;
+                    }
+                });
+                console.log(`Loaded ${Object.keys(secondaryTranslation).length} secondary translations.`);
+                // Optionally save secondary translation to IndexedDB if it's large,
+                // but for simplicity, keeping it in memory for now.
+                // If saving, need a new store and logic to load it on startup.
+                alert("Secondary translation loaded successfully!");
+                displayAyah(settings.lastReadSurah, settings.lastReadAyah); // Refresh view
+            } catch (error) {
+                console.error("Error loading secondary translation:", error);
+                alert("Error loading secondary translation file.");
+            }
+        }
+
+        async function loadUserSettings() {
+            try {
+                const storedSettings = await getData(STORE_SETTINGS, 'userSettings');
+                if (storedSettings) {
+                    settings = storedSettings.data;
+                    console.log("Loaded user settings:", settings);
+                } else {
+                    // Default settings
+                    settings = {
+                        theme: 'light',
+                        arabicFontSize: 24,
+                        translationFontSize: 18,
+                        showSecondaryTranslation: false,
+                        lastReadSurah: 1,
+                        lastReadAyah: 1,
+                        reciter: Object.keys(reciters)[0],
+                        continuousPlay: false,
+                        playbackRate: 1.0,
+                        tilawat: {
+                            active: false,
+                            surah: 1,
+                            ayah: 1,
+                            lineOffset: 0, // For continuous scroll
+                            linesPerPage: 15,
+                            fontSize: 30,
+                            viewMode: 'paginated' // 'paginated' or 'continuous'
+                        }
+                    };
+                    await saveUserSettings(); // Save defaults
+                }
+                applySettings();
+                loadUserNotes();
+                loadUserBookmarks();
+                displayAyah(settings.lastReadSurah, settings.lastReadAyah); // Display last read
+            } catch (error) {
+                console.error("Error loading user settings:", error);
+                // Use default settings if loading fails
+                settings = {
+                     theme: 'light',
+                    arabicFontSize: 24,
+                    translationFontSize: 18,
+                    showSecondaryTranslation: false,
+                    lastReadSurah: 1,
+                    lastReadAyah: 1,
+                    reciter: Object.keys(reciters)[0],
+                    continuousPlay: false,
+                    playbackRate: 1.0,
+                     tilawat: {
+                        active: false,
+                        surah: 1,
+                        ayah: 1,
+                        lineOffset: 0,
+                        linesPerPage: 15,
+                        fontSize: 30,
+                        viewMode: 'paginated'
+                    }
+                };
+                 applySettings();
+                 loadUserNotes();
+                 loadUserBookmarks();
+                 displayAyah(settings.lastReadSurah, settings.lastReadAyah);
+            }
+        }
+
+        async function saveUserSettings() {
+            try {
+                await putData(STORE_SETTINGS, { id: 'userSettings', data: settings });
+                console.log("User settings saved.");
+            } catch (error) {
+                console.error("Error saving user settings:", error);
+            }
+        }
+
+        async function loadUserNotes() {
+            try {
+                const storedNotes = await getAllData(STORE_NOTES);
+                notes = {};
+                storedNotes.forEach(note => {
+                    notes[note.id] = note.text;
+                });
+                console.log(`Loaded ${Object.keys(notes).length} user notes.`);
+            } catch (error) {
+                console.error("Error loading user notes:", error);
+            }
+        }
+
+        async function saveUserNote(surah, ayah, text) {
+            const id = `${surah}_${ayah}`;
+            if (text.trim() === '') {
+                // Remove note if text is empty
+                try {
+                    const transaction = db.transaction([STORE_NOTES], 'readwrite');
+                    const store = transaction.objectStore(STORE_NOTES);
+                    const request = store.delete(id);
+                    request.onsuccess = () => {
+                        delete notes[id];
+                        console.log(`Note for ${id} removed.`);
+                    };
+                    request.onerror = (event) => console.error("Error deleting note:", event.target.error);
+                } catch (error) {
+                     console.error("Error deleting note:", error);
+                }
+            } else {
+                try {
+                    await putData(STORE_NOTES, { id: id, text: text });
+                    notes[id] = text;
+                    console.log(`Note for ${id} saved.`);
+                } catch (error) {
+                    console.error("Error saving note:", error);
+                }
+            }
+        }
+
+        async function loadUserBookmarks() {
+            try {
+                const storedBookmarks = await getAllData(STORE_BOOKMARKS);
+                bookmarks = {};
+                storedBookmarks.forEach(bookmark => {
+                    bookmarks[bookmark.id] = true;
+                });
+                console.log(`Loaded ${Object.keys(bookmarks).length} user bookmarks.`);
+            } catch (error) {
+                console.error("Error loading user bookmarks:", error);
+            }
+        }
+
+        async function toggleBookmark(surah, ayah) {
+            const id = `${surah}_${ayah}`;
+            if (bookmarks[id]) {
+                // Remove bookmark
+                try {
+                    const transaction = db.transaction([STORE_BOOKMARKS], 'readwrite');
+                    const store = transaction.objectStore(STORE_BOOKMARKS);
+                    const request = store.delete(id);
+                    request.onsuccess = () => {
+                        delete bookmarks[id];
+                        console.log(`Bookmark for ${id} removed.`);
+                        updateBookmarkButton(surah, ayah);
+                    };
+                    request.onerror = (event) => console.error("Error deleting bookmark:", event.target.error);
+                } catch (error) {
+                     console.error("Error deleting bookmark:", error);
+                }
+            } else {
+                // Add bookmark
+                try {
+                    await putData(STORE_BOOKMARKS, { id: id });
+                    bookmarks[id] = true;
+                    console.log(`Bookmark for ${id} added.`);
+                    updateBookmarkButton(surah, ayah);
+                } catch (error) {
+                    console.error("Error adding bookmark:", error);
+                }
+            }
+        }
+
+        function updateBookmarkButton(surah, ayah) {
+            const id = `${surah}_${ayah}`;
+            const button = document.querySelector(`.ayah[data-surah="${surah}"][data-ayah="${ayah}"] .bookmark-button`);
+            if (button) {
+                button.textContent = bookmarks[id] ? '⭐ Bookmarked' : '☆ Bookmark';
+            }
+        }
+
+
+        // --- UI Population ---
+        function populateSelectors() {
+            const surahSelector = document.getElementById('surah-selector');
+            const juzSelector = document.getElementById('juz-selector');
+            const reciterSelector = document.getElementById('reciter-selector');
+
+            // Surah Selector
+            surahSelector.innerHTML = '';
+            surahNames.forEach((name, index) => {
+                const option = document.createElement('option');
+                option.value = index + 1;
+                option.textContent = `${index + 1}. ${name}`;
+                surahSelector.appendChild(option);
+            });
+
+            // Juz Selector
+            juzSelector.innerHTML = '';
+            for (let i = 1; i <= 30; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Juz ${i}`;
+                juzSelector.appendChild(option);
+            }
+
+            // Reciter Selector
+            reciterSelector.innerHTML = '';
+            for (const name in reciters) {
+                const option = document.createElement('option');
+                option.value = reciters[name];
+                option.textContent = name;
+                reciterSelector.appendChild(option);
+            }
+
+             // Populate Tilawat selectors
+             populateTilawatSelectors();
+        }
+
+        function populateAyahSelector(surahNumber) {
+            const ayahSelector = document.getElementById('ayah-selector');
+            ayahSelector.innerHTML = '';
+            const ayahsInSurah = quranData.filter(ayah => ayah.surah === surahNumber).length;
+            for (let i = 1; i <= ayahsInSurah; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                ayahSelector.appendChild(option);
+            }
+        }
+
+        // --- Display Functions ---
+        function displayAyah(surahNumber, ayahNumber) {
+            const displayArea = document.getElementById('quran-display');
+            displayArea.innerHTML = ''; // Clear previous content
+
+            const ayahIndex = quranData.findIndex(a => a.surah === surahNumber && a.ayah === ayahNumber);
+            if (ayahIndex === -1) {
+                displayArea.innerHTML = `<p>Ayah ${surahNumber}:${ayahNumber} not found.</p>`;
+                return;
+            }
+
+            // Find the start and end index for the current Surah
+            let surahStartIndex = quranData.findIndex(a => a.surah === surahNumber && a.ayah === 1);
+            let surahEndIndex = quranData.length - 1;
+            for(let i = ayahIndex; i < quranData.length; i++) {
+                if (quranData[i].surah !== surahNumber) {
+                    surahEndIndex = i - 1;
+                    break;
+                }
+            }
+
+
+            // Display the current Surah from the start
+            for (let i = surahStartIndex; i <= surahEndIndex; i++) {
+                const ayah = quranData[i];
+                const ayahElement = document.createElement('div');
+                ayahElement.classList.add('ayah');
+                ayahElement.dataset.surah = ayah.surah;
+                ayahElement.dataset.ayah = ayah.ayah;
+                ayahElement.id = `ayah-${ayah.surah}-${ayah.ayah}`; // Add ID for easy scrolling
+
+                // Add Bismillah before each Surah except Tawbah
+                if (ayah.ayah === 1 && ayah.surah !== 9) {
+                    const bismillah = document.createElement('div');
+                    bismillah.classList.add('ayah-arabic');
+                    bismillah.textContent = 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ';
+                    bismillah.style.textAlign = 'center';
+                    bismillah.style.marginBottom = '20px';
+                    displayArea.appendChild(bismillah);
+                }
+
+                const arabicElement = document.createElement('div');
+                arabicElement.classList.add('ayah-arabic');
+                arabicElement.textContent = ayah.arabic;
+                arabicElement.style.fontSize = `${settings.arabicFontSize}px`;
+                displayArea.appendChild(arabicElement);
+
+                const urduElement = document.createElement('div');
+                urduElement.classList.add('ayah-urdu');
+                urduElement.textContent = `ترجمہ: ${ayah.urdu}`;
+                urduElement.style.fontSize = `${settings.translationFontSize}px`;
+                displayArea.appendChild(urduElement);
+
+                const secondaryTranslationText = secondaryTranslation[`${ayah.surah}_${ayah.ayah}`];
+                if (settings.showSecondaryTranslation && secondaryTranslationText) {
+                    const secondaryElement = document.createElement('div');
+                    secondaryElement.classList.add('ayah-secondary');
+                    secondaryElement.textContent = secondaryTranslationText;
+                    secondaryElement.style.fontSize = `${settings.translationFontSize * 0.9}px`; // Slightly smaller
+                    displayArea.appendChild(secondaryElement);
+                }
+
+                const metaElement = document.createElement('div');
+                metaElement.classList.add('ayah-meta');
+                metaElement.textContent = `Surah ${ayah.surah}:${ayah.ayah} (${surahNames[ayah.surah - 1]})`;
+                displayArea.appendChild(metaElement);
+
+                // Add Bookmark Button
+                const bookmarkButton = document.createElement('button');
+                bookmarkButton.classList.add('bookmark-button');
+                bookmarkButton.textContent = bookmarks[`${ayah.surah}_${ayah.ayah}`] ? '⭐ Bookmarked' : '☆ Bookmark';
+                bookmarkButton.onclick = () => toggleBookmark(ayah.surah, ayah.ayah);
+                displayArea.appendChild(bookmarkButton);
+
+                 // Add Notes Area
+                 const noteArea = document.createElement('textarea');
+                 noteArea.placeholder = "Add your note here...";
+                 noteArea.value = notes[`${ayah.surah}_${ayah.ayah}`] || '';
+                 noteArea.style.width = '100%';
+                 noteArea.style.marginTop = '10px';
+                 noteArea.style.padding = '8px';
+                 noteArea.style.border = '1px solid #ccc';
+                 noteArea.style.borderRadius = '4px';
+                 noteArea.onchange = (e) => saveUserNote(ayah.surah, ayah.ayah, e.target.value);
+                 displayArea.appendChild(noteArea);
+
+
+                displayArea.appendChild(ayahElement); // Append the main ayah container
+            }
+
+            // Scroll to the requested Ayah
+            setTimeout(() => {
+                const targetAyahElement = document.getElementById(`ayah-${surahNumber}-${ayahNumber}`);
+                if (targetAyahElement) {
+                    targetAyahElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100); // Small delay to allow rendering
+        }
+
+        function applySettings() {
+            document.body.className = `theme-${settings.theme}`;
+            document.getElementById('theme-selector').value = settings.theme;
+
+            document.getElementById('arabic-font-size').value = settings.arabicFontSize;
+            document.getElementById('arabic-font-size-value').textContent = `${settings.arabicFontSize}px`;
+            document.querySelectorAll('.ayah-arabic').forEach(el => el.style.fontSize = `${settings.arabicFontSize}px`);
+
+            document.getElementById('translation-font-size').value = settings.translationFontSize;
+             document.getElementById('translation-font-size-value').textContent = `${settings.translationFontSize}px`;
+            document.querySelectorAll('.ayah-urdu, .ayah-secondary').forEach(el => el.style.fontSize = `${settings.translationFontSize}px`);
+
+            document.getElementById('show-secondary-translation').checked = settings.showSecondaryTranslation;
+            // Re-render or update visibility of secondary translation if needed
+            document.querySelectorAll('.ayah-secondary').forEach(el => el.style.display = settings.showSecondaryTranslation ? 'block' : 'none');
+
+
+            document.getElementById('reciter-selector').value = settings.reciter;
+            document.getElementById('continuous-play').checked = settings.continuousPlay;
+            document.getElementById('playback-rate').value = settings.playbackRate;
+            document.getElementById('quran-audio').playbackRate = settings.playbackRate;
+
+             // Apply Tilawat settings
+             document.getElementById('tilawatAddon_lines-per-page').value = settings.tilawat.linesPerPage;
+             document.getElementById('tilawatAddon_font-size').value = settings.tilawat.fontSize;
+             document.getElementById('tilawatAddon_font-size-value').textContent = `${settings.tilawat.fontSize}px`;
+             document.querySelector(`input[name="tilawatAddon_view-mode"][value="${settings.tilawat.viewMode}"]`).checked = true;
+
+             if (settings.tilawat.active) {
+                 enterTilawatMode();
+             } else {
+                 exitTilawatMode();
+             }
+        }
+
+        // --- Navigation ---
+        function goToSelectedAyah() {
+            const surah = parseInt(document.getElementById('surah-selector').value, 10);
+            const ayah = parseInt(document.getElementById('ayah-selector').value, 10);
+            if (!isNaN(surah) && !isNaN(ayah)) {
+                displayAyah(surah, ayah);
+                settings.lastReadSurah = surah;
+                settings.lastReadAyah = ayah;
+                saveUserSettings();
+            }
+        }
+
+        function goToSelectedJuz() {
+            const juz = parseInt(document.getElementById('juz-selector').value, 10);
+            if (!isNaN(juz) && juz >= 1 && juz <= 30) {
+                const start = juzStartAyahs[juz - 1];
+                displayAyah(start.surah, start.ayah);
+                 settings.lastReadSurah = start.surah;
+                 settings.lastReadAyah = start.ayah;
+                 saveUserSettings();
+            }
+        }
+
+        function goToLastRead() {
+            displayAyah(settings.lastReadSurah, settings.lastReadAyah);
+        }
+
+        // --- Search ---
+        function simpleSearch(query) {
+            const results = [];
+            const lowerQuery = query.toLowerCase();
+
+            quranData.forEach(ayah => {
+                let match = false;
+                let highlightedArabic = ayah.arabic;
+                let highlightedUrdu = ayah.urdu;
+                let highlightedSecondary = secondaryTranslation[`${ayah.surah}_${ayah.ayah}`] || '';
+
+                // Simple keyword match (case-insensitive)
+                if (ayah.arabic.toLowerCase().includes(lowerQuery)) {
+                    match = true;
+                    highlightedArabic = highlightText(ayah.arabic, query);
+                }
+                if (ayah.urdu.toLowerCase().includes(lowerQuery)) {
+                    match = true;
+                    highlightedUrdu = highlightText(ayah.urdu, query);
+                }
+                if (highlightedSecondary.toLowerCase().includes(lowerQuery)) {
+                    match = true;
+                    highlightedSecondary = highlightText(highlightedSecondary, query);
+                }
+
+                if (match) {
+                    results.push({
+                        surah: ayah.surah,
+                        ayah: ayah.ayah,
+                        arabic: highlightedArabic,
+                        urdu: highlightedUrdu,
+                        secondary: highlightedSecondary
+                    });
+                }
+            });
+            return results;
+        }
+
+        function highlightText(text, query) {
+            if (!query) return text;
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        function displaySearchResults(results) {
+            const resultsDiv = document.getElementById('search-results');
+            resultsDiv.innerHTML = '';
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<p>No results found.</p>';
+                return;
+            }
+
+            results.forEach(result => {
+                const ayahElement = document.createElement('div');
+                ayahElement.classList.add('ayah');
+                ayahElement.classList.add('search-result-item'); // Add a class for search results
+                ayahElement.dataset.surah = result.surah;
+                ayahElement.dataset.ayah = result.ayah;
+
+                const arabicElement = document.createElement('div');
+                arabicElement.classList.add('ayah-arabic');
+                arabicElement.innerHTML = result.arabic;
+                 arabicElement.style.fontSize = `${settings.arabicFontSize}px`;
+                ayahElement.appendChild(arabicElement);
+
+                const urduElement = document.createElement('div');
+                urduElement.classList.add('ayah-urdu');
+                urduElement.innerHTML = `ترجمہ: ${result.urdu}`;
+                 urduElement.style.fontSize = `${settings.translationFontSize}px`;
+                ayahElement.appendChild(urduElement);
+
+                if (settings.showSecondaryTranslation && result.secondary) {
+                    const secondaryElement = document.createElement('div');
+                    secondaryElement.classList.add('ayah-secondary');
+                    secondaryElement.innerHTML = result.secondary;
+                     secondaryElement.style.fontSize = `${settings.translationFontSize * 0.9}px`;
+                    ayahElement.appendChild(secondaryElement);
+                }
+
+                const metaElement = document.createElement('div');
+                metaElement.classList.add('ayah-meta');
+                metaElement.textContent = `Surah ${result.surah}:${result.ayah} (${surahNames[result.surah - 1]})`;
+                ayahElement.appendChild(metaElement);
+
+                // Make the search result clickable to go to that ayah
+                ayahElement.style.cursor = 'pointer';
+                ayahElement.onclick = () => {
+                    displayAyah(result.surah, result.ayah);
+                    settings.lastReadSurah = result.surah;
+                    settings.lastReadAyah = result.ayah;
+                    saveUserSettings();
+                    // Clear search results after navigating
+                    resultsDiv.innerHTML = '';
+                    document.getElementById('search-input').value = '';
+                };
+
+
+                resultsDiv.appendChild(ayahElement);
+            });
+        }
+
+        // --- Audio Playback ---
+        let currentAudioAyah = null;
+        const audioPlayer = document.getElementById('quran-audio');
+
+        function getAudioUrl(reciter, surah, ayah) {
+            // Format: [reciter]/[surah_padded3][ayah_padded3].mp3
+            const surahPadded = String(surah).padStart(3, '0');
+            const ayahPadded = String(ayah).padStart(3, '0');
+            // Using everyayah.com structure
+            return `https://everyayah.com/data/${reciter}/${surahPadded}${ayahPadded}.mp3`;
+        }
+
+        function playAyah(surah, ayah) {
+            if (!quranData.find(a => a.surah === surah && a.ayah === ayah)) {
+                console.warn(`Ayah ${surah}:${ayah} not found for audio.`);
+                return;
+            }
+
+            const reciter = document.getElementById('reciter-selector').value;
+            const audioUrl = getAudioUrl(reciter, surah, ayah);
+
+            // Remove highlight from previously playing ayah
+            if (currentAudioAyah) {
+                const prevAyahElement = document.getElementById(`ayah-${currentAudioAyah.surah}-${currentAudioAyah.ayah}`);
+                if (prevAyahElement) {
+                    prevAyahElement.classList.remove('currently-playing');
+                }
+            }
+
+            currentAudioAyah = { surah: surah, ayah: ayah };
+
+            // Add highlight to the current ayah
+            const currentAyahElement = document.getElementById(`ayah-${surah}-${ayah}`);
+            if (currentAyahElement) {
+                currentAyahElement.classList.add('currently-playing');
+                currentAyahElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            audioPlayer.src = audioUrl;
+            audioPlayer.playbackRate = settings.playbackRate;
+            audioPlayer.play().catch(e => console.error("Audio playback failed:", e));
+
+            // Update last read position when audio starts
+            settings.lastReadSurah = surah;
+            settings.lastReadAyah = ayah;
+            saveUserSettings();
+        }
+
+        function pauseAudio() {
+            audioPlayer.pause();
+        }
+
+        function stopAudio() {
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+             if (currentAudioAyah) {
+                const prevAyahElement = document.getElementById(`ayah-${currentAudioAyah.surah}-${currentAudioAyah.ayah}`);
+                if (prevAyahElement) {
+                    prevAyahElement.classList.remove('currently-playing');
+                }
+                currentAudioAyah = null;
+            }
+        }
+
+        function playNextAyah() {
+            if (!currentAudioAyah) return;
+
+            const currentSurah = currentAudioAyah.surah;
+            const currentAyah = currentAudioAyah.ayah;
+
+            const currentAyahIndex = quranData.findIndex(a => a.surah === currentSurah && a.ayah === currentAyah);
+            if (currentAyahIndex === -1) return;
+
+            const nextAyahData = quranData[currentAyahIndex + 1];
+
+            if (nextAyahData) {
+                playAyah(nextAyahData.surah, nextAyahData.ayah);
+            } else {
+                // End of Quran
+                stopAudio();
+                console.log("End of Quran recitation.");
+            }
+        }
+
+        function playPrevAyah() {
+             if (!currentAudioAyah) return;
+
+            const currentSurah = currentAudioAyah.surah;
+            const currentAyah = currentAudioAyah.ayah;
+
+            const currentAyahIndex = quranData.findIndex(a => a.surah === currentSurah && a.ayah === currentAyah);
+            if (currentAyahIndex === -1) return;
+
+            const prevAyahData = quranData[currentAyahIndex - 1];
+
+            if (prevAyahData) {
+                playAyah(prevAyahData.surah, prevAyahData.ayah);
+            } else {
+                // Beginning of Quran
+                stopAudio();
+                console.log("Beginning of Quran recitation.");
+            }
+        }
+
+
+        // --- Data Backup and Restore ---
+        async function backupData() {
+            try {
+                const allQuran = await getAllData(STORE_QURAN); // Include Quran data in backup
+                const allNotes = await getAllData(STORE_NOTES);
+                const allBookmarks = await getAllData(STORE_BOOKMARKS);
+                const allSettings = await getData(STORE_SETTINGS, 'userSettings'); // Get the single settings object
+
+                const backup = {
+                    quran: allQuran,
+                    notes: allNotes,
+                    bookmarks: allBookmarks,
+                    settings: allSettings ? allSettings.data : null, // Store the data property
+                    secondaryTranslation: secondaryTranslation // Include loaded secondary translation
+                };
+
+                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'quran_vision_backup.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                alert("Backup created successfully!");
+            } catch (error) {
+                console.error("Backup failed:", error);
+                alert("Backup failed. See console for details.");
+            }
+        }
+
+        async function restoreData(file) {
+            if (!confirm("Restoring data will overwrite your current notes, bookmarks, and settings. Are you sure?")) {
+                return;
+            }
+
+            try {
+                const text = await file.text();
+                const backup = JSON.parse(text);
+
+                // Clear existing user data stores
+                await clearStore(STORE_NOTES);
+                await clearStore(STORE_BOOKMARKS);
+                await clearStore(STORE_SETTINGS);
+
+                // Restore Notes
+                if (backup.notes && Array.isArray(backup.notes)) {
+                    const noteTransaction = db.transaction([STORE_NOTES], 'readwrite');
+                    const noteStore = noteTransaction.objectStore(STORE_NOTES);
+                    backup.notes.forEach(note => noteStore.add(note));
+                    await new Promise(resolve => noteTransaction.oncomplete = resolve);
+                    console.log(`Restored ${backup.notes.length} notes.`);
+                }
+
+                // Restore Bookmarks
+                if (backup.bookmarks && Array.isArray(backup.bookmarks)) {
+                    const bookmarkTransaction = db.transaction([STORE_BOOKMARKS], 'readwrite');
+                    const bookmarkStore = bookmarkTransaction.objectStore(STORE_BOOKMARKS);
+                    backup.bookmarks.forEach(bookmark => bookmarkStore.add(bookmark));
+                     await new Promise(resolve => bookmarkTransaction.oncomplete = resolve);
+                    console.log(`Restored ${backup.bookmarks.length} bookmarks.`);
+                }
+
+                // Restore Settings
+                if (backup.settings) {
+                    await putData(STORE_SETTINGS, { id: 'userSettings', data: backup.settings });
+                    console.log("Restored settings.");
+                }
+
+                 // Restore Secondary Translation (in memory)
+                 if (backup.secondaryTranslation) {
+                     secondaryTranslation = backup.secondaryTranslation;
+                     console.log(`Restored ${Object.keys(secondaryTranslation).length} secondary translations.`);
+                 }
+
+
+                // Reload data and apply settings
+                await loadUserNotes();
+                await loadUserBookmarks();
+                await loadUserSettings(); // This will also apply settings and display last read
+
+                alert("Data restored successfully!");
+            } catch (error) {
+                console.error("Restore failed:", error);
+                alert("Restore failed. See console for details. Ensure the file is a valid backup JSON.");
+            }
+        }
+
+
+        // --- Tilawat Mode (JS Managed) ---
+        const tilawatAddon_container = document.getElementById('tilawatAddon_container');
+        const tilawatAddon_content = document.getElementById('tilawatAddon_content');
+        const tilawatAddon_controls = document.getElementById('tilawatAddon_controls');
+        const tilawatAddon_navButtons = document.getElementById('tilawatAddon_nav-buttons');
+        const tilawatAddon_toggleIcon = document.getElementById('tilawat-toggle-icon');
+
+        const tilawatAddon_surahSelector = document.getElementById('tilawatAddon_surah-selector');
+        const tilawatAddon_ayahSelector = document.getElementById('tilawatAddon_ayah-selector');
+        const tilawatAddon_goToAyahButton = document.getElementById('tilawatAddon_go-to-ayah');
+        const tilawatAddon_linesPerPageInput = document.getElementById('tilawatAddon_lines-per-page');
+        const tilawatAddon_fontSizeInput = document.getElementById('tilawatAddon_font-size');
+        const tilawatAddon_fontSizeValueSpan = document.getElementById('tilawatAddon_font-size-value');
+        const tilawatAddon_viewModeRadios = document.querySelectorAll('input[name="tilawatAddon_view-mode"]');
+        const tilawatAddon_prevPageButton = document.getElementById('tilawatAddon_prev-page');
+        const tilawatAddon_nextPageButton = document.getElementById('tilawatAddon_next-page');
+
+        let tilawatAddon_currentAyahIndex = 0; // Index in the quranData array
+        let tilawatAddon_linesPerPage = 15;
+        let tilawatAddon_viewMode = 'paginated'; // 'paginated' or 'continuous'
+        let tilawatAddon_intersectionObserver = null; // For continuous mode
+
+        function populateTilawatSelectors() {
+             tilawatAddon_surahSelector.innerHTML = '';
+             surahNames.forEach((name, index) => {
+                 const option = document.createElement('option');
+                 option.value = index + 1;
+                 option.textContent = `${index + 1}. ${name}`;
+                 tilawatAddon_surahSelector.appendChild(option);
+             });
+             // Populate ayah selector for the initial surah (Surah 1)
+             populateTilawatAyahSelector(1);
+        }
+
+        function populateTilawatAyahSelector(surahNumber) {
+             const ayahSelector = tilawatAddon_ayahSelector;
+             ayahSelector.innerHTML = '';
+             const ayahsInSurah = quranData.filter(ayah => ayah.surah === surahNumber).length;
+             for (let i = 1; i <= ayahsInSurah; i++) {
+                 const option = document.createElement('option');
+                 option.value = i;
+                 option.textContent = i;
+                 ayahSelector.appendChild(option);
+             }
+        }
+
+
+        function enterTilawatMode() {
+            document.body.classList.add('tilawat-active');
+            tilawatAddon_container.style.display = 'block';
+            tilawatAddon_controls.style.display = 'flex'; // Show controls
+            tilawatAddon_navButtons.style.display = 'flex'; // Show nav buttons
+
+            // Apply Tilawat specific settings
+            tilawatAddon_linesPerPage = parseInt(tilawatAddon_linesPerPageInput.value, 10);
+            tilawatAddon_viewMode = document.querySelector('input[name="tilawatAddon_view-mode"]:checked').value;
+            tilawatAddon_content.style.fontSize = `${tilawatAddon_fontSizeInput.value}px`;
+
+            // Load content based on view mode and last position
+            if (tilawatAddon_viewMode === 'paginated') {
+                tilawatAddon_navButtons.style.display = 'flex'; // Show nav buttons
+                loadTilawatPage(settings.tilawat.surah, settings.tilawat.ayah);
+            } else { // continuous
+                 tilawatAddon_navButtons.style.display = 'none'; // Hide nav buttons in continuous
+                 loadTilawatContinuous(settings.tilawat.surah, settings.tilawat.ayah, settings.tilawat.lineOffset);
+            }
+
+            settings.tilawat.active = true;
+            saveUserSettings();
+        }
+
+        function exitTilawatMode() {
+            document.body.classList.remove('tilawat-active');
+            tilawatAddon_container.style.display = 'none';
+            tilawatAddon_controls.style.display = 'none'; // Hide controls
+            tilawatAddon_navButtons.style.display = 'none'; // Hide nav buttons
+
+            // Stop IntersectionObserver if active
+            if (tilawatAddon_intersectionObserver) {
+                tilawatAddon_intersectionObserver.disconnect();
+                tilawatAddon_intersectionObserver = null;
+            }
+
+            // Clear Tilawat content
+            tilawatAddon_content.innerHTML = '';
+
+            settings.tilawat.active = false;
+            saveUserSettings();
+            // Re-display the main app's last read position
+            displayAyah(settings.lastReadSurah, settings.lastReadAyah);
+        }
+
+        function loadTilawatPage(surahNumber, ayahNumber) {
+            tilawatAddon_content.innerHTML = ''; // Clear content for pagination
+
+            const startIndex = quranData.findIndex(a => a.surah === surahNumber && a.ayah === ayahNumber);
+            if (startIndex === -1) {
+                tilawatAddon_content.innerHTML = "<p>Error loading page.</p>";
+                return;
+            }
+
+            tilawatAddon_currentAyahIndex = startIndex;
+            let linesRendered = 0;
+
+            for (let i = startIndex; i < quranData.length && linesRendered < tilawatAddon_linesPerPage; i++) {
+                const ayah = quranData[i];
+
+                 // Add Bismillah before each Surah except Tawbah if it's the first ayah on the page
+                 if (ayah.ayah === 1 && ayah.surah !== 9 && linesRendered === 0) {
+                     const bismillah = document.createElement('div');
+                     bismillah.classList.add('tilawatAddon_bismillah');
+                     bismillah.textContent = 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ';
+                     tilawatAddon_content.appendChild(bismillah);
+                     linesRendered++; // Count Bismillah as a line
+                 }
+
+
+                const ayahElement = document.createElement('div');
+                ayahElement.classList.add('tilawatAddon_ayah');
+                ayahElement.dataset.surah = ayah.surah;
+                ayahElement.dataset.ayah = ayah.ayah;
+                ayahElement.id = `tilawat-ayah-${ayah.surah}-${ayah.ayah}`; // Add ID for scrolling
+
+                const arabicElement = document.createElement('div');
+                arabicElement.textContent = ayah.arabic;
+                ayahElement.appendChild(arabicElement);
+
+                 // Optionally add translations in Tilawat mode
+                 if (settings.showSecondaryTranslation) { // Using secondary translation setting for simplicity
+                     const urduElement = document.createElement('div');
+                     urduElement.textContent = `ترجمہ: ${ayah.urdu}`;
+                     urduElement.style.fontSize = `${settings.tilawat.fontSize * 0.6}px`; // Smaller translation font
+                     urduElement.style.fontFamily = 'Noto Nastaliq Urdu, serif';
+                     urduElement.style.direction = 'rtl';
+                     urduElement.style.textAlign = 'right';
+                     ayahElement.appendChild(urduElement);
+
+                     const secondaryTranslationText = secondaryTranslation[`${ayah.surah}_${ayah.ayah}`];
+                     if (secondaryTranslationText) {
+                         const secondaryElement = document.createElement('div');
+                         secondaryElement.textContent = secondaryTranslationText;
+                         secondaryElement.style.fontSize = `${settings.tilawat.fontSize * 0.5}px`; // Even smaller
+                         secondaryElement.style.fontStyle = 'italic';
+                         ayahElement.appendChild(secondaryElement);
+                     }
+                 }
+
+
+                tilawatAddon_content.appendChild(ayahElement);
+                linesRendered++; // Count the ayah as a line (simplification)
+
+                 // If the next ayah is the start of a new surah (and not Tawbah),
+                 // and we have space for Bismillah + at least one ayah,
+                 // stop rendering on this page to start the new surah on the next page.
+                 if (i + 1 < quranData.length && quranData[i + 1].ayah === 1 && quranData[i + 1].surah !== 9 && linesRendered + 2 <= tilawatAddon_linesPerPage) {
+                     break;
+                 }
+            }
+
+            // Update selectors to reflect the first ayah on the current page
+            const firstAyahOnPage = quranData[startIndex];
+            if (firstAyahOnPage) {
+                 tilawatAddon_surahSelector.value = firstAyahOnPage.surah;
+                 populateTilawatAyahSelector(firstAyahOnPage.surah);
+                 tilawatAddon_ayahSelector.value = firstAyahOnPage.ayah;
+                 // Save current position
+                 settings.tilawat.surah = firstAyahOnPage.surah;
+                 settings.tilawat.ayah = firstAyahOnPage.ayah;
+                 settings.tilawat.lineOffset = 0; // Reset line offset for paginated
+                 saveUserSettings();
+            }
+
+             // Scroll to the top of the content area
+             tilawatAddon_container.scrollTop = 0;
+        }
+
+        function loadTilawatContinuous(startSurah, startAyah, startLineOffset = 0) {
+             tilawatAddon_content.innerHTML = ''; // Clear content for continuous
+             tilawatAddon_navButtons.style.display = 'none'; // Hide nav buttons
+
+             const startIndex = quranData.findIndex(a => a.surah === startSurah && a.ayah === startAyah);
+             if (startIndex === -1) {
+                 tilawatAddon_content.innerHTML = "<p>Error loading content.</p>";
+                 return;
+             }
+
+             tilawatAddon_currentAyahIndex = startIndex;
+             let linesRendered = 0;
+             const initialChunkSize = tilawatAddon_linesPerPage * 2; // Load a larger initial chunk
+
+             // Render the initial chunk
+             for (let i = startIndex; i < quranData.length && linesRendered < initialChunkSize; i++) {
+                 const ayah = quranData[i];
+                 renderTilawatAyah(ayah);
+                 linesRendered++;
+             }
+
+             // Set up IntersectionObserver to load more content
+             setupIntersectionObserver();
+
+             // Scroll to the approximate position based on lineOffset
+             // This is a simplification; a more accurate scroll would require measuring line heights.
+             // For now, we just scroll to the start ayah.
+             setTimeout(() => {
+                 const targetAyahElement = document.getElementById(`tilawat-ayah-${startSurah}-${startAyah}`);
+                 if (targetAyahElement) {
+                     targetAyahElement.scrollIntoView({ behavior: 'instant', block: 'start' });
+                     // Attempt to adjust scroll based on lineOffset (very rough)
+                     tilawatAddon_container.scrollTop += startLineOffset * (parseInt(tilawatAddon_fontSizeInput.value, 10) * 2.5); // Estimate line height
+                 }
+             }, 100); // Small delay
+
+             // Update selectors to reflect the start ayah
+             tilawatAddon_surahSelector.value = startSurah;
+             populateTilawatAyahSelector(startSurah);
+             tilawatAddon_ayahSelector.value = startAyah;
+
+             // Save current position on scroll (throttled)
+             tilawatAddon_container.onscroll = throttle(saveTilawatPosition, 500);
+        }
+
+        function renderTilawatAyah(ayah) {
+             // Add Bismillah before each Surah except Tawbah
+             if (ayah.ayah === 1 && ayah.surah !== 9) {
+                 const bismillah = document.createElement('div');
+                 bismillah.classList.add('tilawatAddon_bismillah');
+                 bismillah.textContent = 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ';
+                 tilawatAddon_content.appendChild(bismillah);
+             }
+
+             const ayahElement = document.createElement('div');
+             ayahElement.classList.add('tilawatAddon_ayah');
+             ayahElement.dataset.surah = ayah.surah;
+             ayahElement.dataset.ayah = ayah.ayah;
+             ayahElement.id = `tilawat-ayah-${ayah.surah}-${ayah.ayah}`; // Add ID for scrolling
+
+             const arabicElement = document.createElement('div');
+             arabicElement.textContent = ayah.arabic;
+             ayahElement.appendChild(arabicElement);
+
+             // Optionally add translations in Tilawat mode
+             if (settings.showSecondaryTranslation) {
+                 const urduElement = document.createElement('div');
+                 urduElement.textContent = `ترجمہ: ${ayah.urdu}`;
+                 urduElement.style.fontSize = `${settings.tilawat.fontSize * 0.6}px`;
+                 urduElement.style.fontFamily = 'Noto Nastaliq Urdu, serif';
+                 urduElement.style.direction = 'rtl';
+                 urduElement.style.textAlign = 'right';
+                 ayahElement.appendChild(urduElement);
+
+                 const secondaryTranslationText = secondaryTranslation[`${ayah.surah}_${ayah.ayah}`];
+                 if (secondaryTranslationText) {
+                     const secondaryElement = document.createElement('div');
+                     secondaryElement.textContent = secondaryTranslationText;
+                     secondaryElement.style.fontSize = `${settings.tilawat.fontSize * 0.5}px`;
+                     secondaryElement.style.fontStyle = 'italic';
+                     ayahElement.appendChild(secondaryElement);
+                 }
+             }
+
+             tilawatAddon_content.appendChild(ayahElement);
+        }
+
+
+        function setupIntersectionObserver() {
+            if (tilawatAddon_intersectionObserver) {
+                tilawatAddon_intersectionObserver.disconnect();
+            }
+
+            const options = {
+                root: tilawatAddon_container,
+                rootMargin: '0px 0px 200px 0px', // Load when 200px from bottom
+                threshold: 0.1 // Trigger when 10% of the last element is visible
+            };
+
+            tilawatAddon_intersectionObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        loadMoreTilawatContent();
+                    }
+                });
+            }, options);
+
+            // Observe the last ayah element initially
+            const lastAyahElement = tilawatAddon_content.lastElementChild;
+            if (lastAyahElement) {
+                tilawatAddon_intersectionObserver.observe(lastAyahElement);
+            }
+        }
+
+        function loadMoreTilawatContent() {
+             // Stop observing the current last element
+             if (tilawatAddon_content.lastElementChild) {
+                 tilawatAddon_intersectionObserver.unobserve(tilawatAddon_content.lastElementChild);
+             }
+
+             const currentLastAyahIndex = quranData.findIndex(a => {
+                 const lastElement = tilawatAddon_content.lastElementChild;
+                 if (!lastElement || !lastElement.dataset) return false;
+                 return a.surah == lastElement.dataset.surah && a.ayah == lastElement.dataset.ayah;
+             });
+
+             if (currentLastAyahIndex === -1 || currentLastAyahIndex >= quranData.length - 1) {
+                 console.log("End of Quran reached.");
+                 return; // Already at the end
+             }
+
+             const startIndex = currentLastAyahIndex + 1;
+             const chunkSize = tilawatAddon_linesPerPage; // Load one chunk at a time
+             let linesRendered = 0;
+
+             for (let i = startIndex; i < quranData.length && linesRendered < chunkSize; i++) {
+                 const ayah = quranData[i];
+                 renderTilawatAyah(ayah);
+                 linesRendered++;
+             }
+
+             // Observe the new last ayah element
+             const newLastAyahElement = tilawatAddon_content.lastElementChild;
+             if (newLastAyahElement) {
+                 tilawatAddon_intersectionObserver.observe(newLastAyahElement);
+             }
+        }
+
+
+        function goToNextTilawatPage() {
+            const currentFirstAyahIndex = quranData.findIndex(a => {
+                 const firstElement = tilawatAddon_content.querySelector('.tilawatAddon_ayah');
+                 if (!firstElement || !firstElement.dataset) return false;
+                 return a.surah == firstElement.dataset.surah && a.ayah == firstElement.dataset.ayah;
+            });
+
+            if (currentFirstAyahIndex === -1) return;
+
+            // Find the index of the first ayah on the *next* page
+            let nextPageIndex = currentFirstAyahIndex;
+            let linesCounted = 0;
+            while (nextPageIndex < quranData.length && linesCounted < tilawatAddon_linesPerPage) {
+                 // Count Bismillah if it's the start of a new surah and fits on the page
+                 if (quranData[nextPageIndex].ayah === 1 && quranData[nextPageIndex].surah !== 9 && linesCounted + 1 < tilawatAddon_linesPerPage) {
+                     linesCounted++; // Count Bismillah
+                 }
+                 linesCounted++; // Count the ayah
+                 nextPageIndex++;
+            }
+
+            if (nextPageIndex < quranData.length) {
+                const nextAyah = quranData[nextPageIndex];
+                loadTilawatPage(nextAyah.surah, nextAyah.ayah);
+            } else {
+                console.log("Already on the last page.");
+            }
+        }
+
+        function goToPrevTilawatPage() {
+             const currentFirstAyahIndex = quranData.findIndex(a => {
+                 const firstElement = tilawatAddon_content.querySelector('.tilawatAddon_ayah');
+                 if (!firstElement || !firstElement.dataset) return false;
+                 return a.surah == firstElement.dataset.surah && a.ayah == firstElement.dataset.ayah;
+            });
+
+            if (currentFirstAyahIndex <= 0) {
+                console.log("Already on the first page.");
+                return;
+            }
+
+            // Find the index of the first ayah on the *previous* page
+            let prevPageIndex = currentFirstAyahIndex - 1;
+            let linesCounted = 0;
+            const targetLines = tilawatAddon_linesPerPage;
+
+            // Iterate backwards to find the start of the previous page
+            while (prevPageIndex >= 0 && linesCounted < targetLines) {
+                 // Count Bismillah if it's the start of a new surah and fits on the page
+                 if (quranData[prevPageIndex].ayah === 1 && quranData[prevPageIndex].surah !== 9 && linesCounted + 1 < targetLines) {
+                     linesCounted++; // Count Bismillah
+                 }
+                 linesCounted++; // Count the ayah
+
+                 // If the current ayah is the start of a surah (and not Tawbah) and not the very first ayah of the Quran,
+                 // and we have counted at least one line, this is likely the start of the previous page.
+                 if (prevPageIndex > 0 && quranData[prevPageIndex].ayah === 1 && quranData[prevPageIndex].surah !== 9 && linesCounted > 1) {
+                     break;
+                 }
+
+                 prevPageIndex--;
+            }
+
+            // Adjust prevPageIndex if we went too far back
+            if (prevPageIndex < 0) prevPageIndex = 0;
+
+
+            const prevAyah = quranData[prevPageIndex];
+            loadTilawatPage(prevAyah.surah, prevAyah.ayah);
+        }
+
+        function saveTilawatPosition() {
+             if (tilawatAddon_viewMode === 'continuous') {
+                 const container = tilawatAddon_container;
+                 const scrollTop = container.scrollTop;
+                 const ayahs = tilawatAddon_content.querySelectorAll('.tilawatAddon_ayah');
+
+                 let closestAyah = null;
+                 let minDistance = Infinity;
+                 let lineOffset = 0;
+
+                 // Find the ayah closest to the top of the viewport
+                 for (let i = 0; i < ayahs.length; i++) {
+                     const ayah = ayahs[i];
+                     const rect = ayah.getBoundingClientRect();
+                     const distance = Math.abs(rect.top - container.getBoundingClientRect().top);
+
+                     if (distance < minDistance) {
+                         minDistance = distance;
+                         closestAyah = ayah;
+                         // Estimate line offset within the ayah (very rough)
+                         lineOffset = Math.max(0, Math.floor((container.getBoundingClientRect().top - rect.top) / (parseInt(tilawatAddon_fontSizeInput.value, 10) * 2.5)));
+                     }
+                 }
+
+                 if (closestAyah) {
+                     settings.tilawat.surah = parseInt(closestAyah.dataset.surah, 10);
+                     settings.tilawat.ayah = parseInt(closestAyah.dataset.ayah, 10);
+                     settings.tilawat.lineOffset = lineOffset;
+                     saveUserSettings();
+                 }
+             } else { // Paginated mode
+                 // Position is saved when loading the page
+             }
+        }
+
+        // Simple throttle function
+        function throttle(func, limit) {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            }
+        }
+
+
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            await openDB();
+            await loadQuranData(); // This also populates selectors and loads settings/notes/bookmarks
+        });
+
+        document.getElementById('surah-selector').addEventListener('change', (event) => {
+            const surahNumber = parseInt(event.target.value, 10);
+            populateAyahSelector(surahNumber);
+            // Automatically select the first ayah of the new surah
+            document.getElementById('ayah-selector').value = 1;
+        });
+
+        document.getElementById('go-to-ayah').addEventListener('click', goToSelectedAyah);
+        document.getElementById('go-to-juz').addEventListener('click', goToSelectedJuz);
+        document.getElementById('go-to-last-read').addEventListener('click', goToLastRead);
+
+        document.getElementById('search-button').addEventListener('click', () => {
+            const query = document.getElementById('search-input').value.trim();
+            if (query) {
+                const results = simpleSearch(query);
+                displaySearchResults(results);
+            } else {
+                document.getElementById('search-results').innerHTML = '';
+            }
+        });
+
+        document.getElementById('arabic-font-size').addEventListener('input', (event) => {
+            const size = event.target.value;
+            document.querySelectorAll('.ayah-arabic').forEach(el => el.style.fontSize = `${size}px`);
+            document.getElementById('arabic-font-size-value').textContent = `${size}px`;
+            settings.arabicFontSize = parseInt(size, 10);
+            saveUserSettings();
+        });
+
+        document.getElementById('translation-font-size').addEventListener('input', (event) => {
+            const size = event.target.value;
+            document.querySelectorAll('.ayah-urdu, .ayah-secondary').forEach(el => el.style.fontSize = `${size}px`);
+             document.getElementById('translation-font-size-value').textContent = `${size}px`;
+            settings.translationFontSize = parseInt(size, 10);
+            saveUserSettings();
+        });
+
+        document.getElementById('theme-selector').addEventListener('change', (event) => {
+            settings.theme = event.target.value;
+            applySettings();
+            saveUserSettings();
+        });
+
+        document.getElementById('secondary-translation-file').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('load-secondary-translation').onclick = () => loadSecondaryTranslation(file);
+            }
+        });
+
+        document.getElementById('show-secondary-translation').addEventListener('change', (event) => {
+            settings.showSecondaryTranslation = event.target.checked;
+            saveUserSettings();
+            // Re-display the current ayah to show/hide translation
+            displayAyah(settings.lastReadSurah, settings.lastReadAyah);
+        });
+
+        document.getElementById('backup-data').addEventListener('click', backupData);
+
+        document.getElementById('restore-file').addEventListener('change', (event) => {
+             const file = event.target.files[0];
+             if (file) {
+                 document.getElementById('restore-data').onclick = () => restoreData(file);
+             }
+        });
+
+
+        // Audio Player Listeners
+        document.getElementById('play-ayah').addEventListener('click', () => {
+            const surah = parseInt(document.getElementById('surah-selector').value, 10);
+            const ayah = parseInt(document.getElementById('ayah-selector').value, 10);
+            if (!isNaN(surah) && !isNaN(ayah)) {
+                playAyah(surah, ayah);
+            }
+        });
+        document.getElementById('pause-audio').addEventListener('click', pauseAudio);
+        document.getElementById('stop-audio').addEventListener('click', stopAudio);
+        document.getElementById('prev-ayah').addEventListener('click', playPrevAyah);
+        document.getElementById('next-ayah').addEventListener('click', playNextAyah);
+
+        audioPlayer.addEventListener('ended', () => {
+            if (settings.continuousPlay) {
+                playNextAyah();
+            } else {
+                stopAudio(); // Stop if not continuous
+            }
+        });
+
+        document.getElementById('reciter-selector').addEventListener('change', (event) => {
+            settings.reciter = event.target.value;
+            saveUserSettings();
+            // Stop current playback if reciter changes
+            stopAudio();
+        });
+
+        document.getElementById('continuous-play').addEventListener('change', (event) => {
+            settings.continuousPlay = event.target.checked;
+            saveUserSettings();
+        });
+
+         document.getElementById('playback-rate').addEventListener('change', (event) => {
+             settings.playbackRate = parseFloat(event.target.value);
+             audioPlayer.playbackRate = settings.playbackRate;
+             saveUserSettings();
+         });
+
+
+        // --- Tilawat Mode Listeners ---
+        tilawatAddon_toggleIcon.addEventListener('click', () => {
+            if (document.body.classList.contains('tilawat-active')) {
+                exitTilawatMode();
+            } else {
+                enterTilawatMode();
+            }
+        });
+
+        tilawatAddon_surahSelector.addEventListener('change', (event) => {
+             const surahNumber = parseInt(event.target.value, 10);
+             populateTilawatAyahSelector(surahNumber);
+             // Automatically select the first ayah of the new surah
+             tilawatAddon_ayahSelector.value = 1;
+        });
+
+        tilawatAddon_goToAyahButton.addEventListener('click', () => {
+            const surah = parseInt(tilawatAddon_surahSelector.value, 10);
+            const ayah = parseInt(tilawatAddon_ayahSelector.value, 10);
+            if (!isNaN(surah) && !isNaN(ayah)) {
+                if (tilawatAddon_viewMode === 'paginated') {
+                    loadTilawatPage(surah, ayah);
+                } else { // continuous
+                    loadTilawatContinuous(surah, ayah, 0); // Go to the start of the ayah
+                }
+            }
+        });
+
+        tilawatAddon_linesPerPageInput.addEventListener('change', (event) => {
+            tilawatAddon_linesPerPage = parseInt(event.target.value, 10);
+            settings.tilawat.linesPerPage = tilawatAddon_linesPerPage;
+            saveUserSettings();
+            // Reload content with new setting
+            if (settings.tilawat.active) {
+                 if (tilawatAddon_viewMode === 'paginated') {
+                     loadTilawatPage(settings.tilawat.surah, settings.tilawat.ayah);
+                 } else {
+                     // For continuous, just update the setting, content will load dynamically
+                 }
+            }
+        });
+
+        tilawatAddon_fontSizeInput.addEventListener('input', (event) => {
+            const size = event.target.value;
+            tilawatAddon_content.style.fontSize = `${size}px`;
+            tilawatAddon_fontSizeValueSpan.textContent = `${size}px`;
+            settings.tilawat.fontSize = parseInt(size, 10);
+            saveUserSettings();
+             // Update translation font sizes if visible
+             tilawatAddon_content.querySelectorAll('.tilawatAddon_ayah div:nth-child(2)').forEach(el => el.style.fontSize = `${settings.tilawat.fontSize * 0.6}px`);
+             tilawatAddon_content.querySelectorAll('.tilawatAddon_ayah div:nth-child(3)').forEach(el => el.style.fontSize = `${settings.tilawat.fontSize * 0.5}px`);
+        });
+
+        tilawatAddon_viewModeRadios.forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                tilawatAddon_viewMode = event.target.value;
+                settings.tilawat.viewMode = tilawatAddon_viewMode;
+                saveUserSettings();
+                // Reload content based on new view mode
+                if (settings.tilawat.active) {
+                    if (tilawatAddon_viewMode === 'paginated') {
+                        loadTilawatPage(settings.tilawat.surah, settings.tilawat.ayah);
+                    } else { // continuous
+                        loadTilawatContinuous(settings.tilawat.surah, settings.tilawat.ayah, settings.tilawat.lineOffset);
+                    }
+                }
+            });
+        });
+
+        tilawatAddon_prevPageButton.addEventListener('click', goToPrevTilawatPage);
+        tilawatAddon_nextPageButton.addEventListener('click', goToNextTilawatPage);
+
+        // Keyboard navigation for Tilawat mode
+        document.addEventListener('keydown', (event) => {
+            if (settings.tilawat.active) {
+                if (tilawatAddon_viewMode === 'paginated') {
+                    if (event.key === 'ArrowRight' || event.key === 'PageDown') {
+                        goToNextTilawatPage();
+                        event.preventDefault(); // Prevent default page scroll
+                    } else if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
+                        goToPrevTilawatPage();
+                        event.preventDefault(); // Prevent default page scroll
+                    }
+                } else { // continuous
+                     if (event.key === 'ArrowDown') {
+                         tilawatAddon_container.scrollBy({ top: window.innerHeight * 0.8, behavior: 'smooth' });
+                         event.preventDefault();
+                     } else if (event.key === 'ArrowUp') {
+                         tilawatAddon_container.scrollBy({ top: -window.innerHeight * 0.8, behavior: 'smooth' });
+                         event.preventDefault();
+                     } else if (event.key === 'PageDown') {
+                         tilawatAddon_container.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+                         event.preventDefault();
+                     } else if (event.key === 'PageUp') {
+                         tilawatAddon_container.scrollBy({ top: -window.innerHeight, behavior: 'smooth' });
+                         event.preventDefault();
+                     }
+                }
+            }
+        });
+
+        // Basic Swipe Gestures for Tilawat mode (Paginated)
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        tilawatAddon_container.addEventListener('touchstart', (event) => {
+            if (settings.tilawat.active && tilawatAddon_viewMode === 'paginated') {
+                touchStartX = event.changedTouches[0].screenX;
+            }
+        }, false);
+
+        tilawatAddon_container.addEventListener('touchend', (event) => {
+             if (settings.tilawat.active && tilawatAddon_viewMode === 'paginated') {
+                touchEndX = event.changedTouches[0].screenX;
+                handleSwipeGesture();
+             }
+        }, false);
+
+        function handleSwipeGesture() {
+            const swipeThreshold = 50; // Minimum distance for a swipe
+
+            if (touchEndX < touchStartX - swipeThreshold) {
+                // Swiped left (Next page in RTL)
+                goToNextTilawatPage();
+            } else if (touchEndX > touchStartX + swipeThreshold) {
+                // Swiped right (Previous page in RTL)
+                goToPrevTilawatPage();
+            }
+        }
+
+
+        // --- Initial Load ---
+        // The main loadQuranData function is called on DOMContentLoaded,
+        // which in turn calls populateSelectors and loadUserSettings.
+        // loadUserSettings calls applySettings and displayAyah(lastRead).
+window.onload = function() {
+    setTimeout(function() {
+        const userSettings = {
+            arabicFontSize: 24,
+            continuousPlay: false,
+            lastReadAyah: 1,
+            lastReadSurah: 1,
+            playbackRate: 1,
+            reciter: "Abdul Basit Murattal",
+            showSecondaryTranslation: false,
+            theme: "light",
+            tilawat: {
+                active: false,  // Setting 'active' to false
+                ayah: 1,
+                fontSize: 30,
+                lineOffset: 0,
+                linesPerPage: 15,
+                surah: 1,
+                viewMode: "paginated",
+                translationFontSize: 18
+            }
+        };
+        console.log("User Settings Updated:", userSettings); // Optional, to check if it's updated
+    }, 500); // 0.5 seconds delay
+};
+
+    </script>
+
+</body>
+</html>
