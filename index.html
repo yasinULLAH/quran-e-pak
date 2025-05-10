@@ -1372,78 +1372,95 @@
             }
             return matrix[b.length][a.length];
         }
-        
-        async function performSearch() {
-            const query = searchInput.value.trim().toLowerCase();
-            if (query.length < 2) { // Minimum query length
-                searchResultsContainer.innerHTML = '<p>Please enter at least 2 characters to search.</p>';
-                searchResultsContainer.classList.remove('hidden');
-                fuzzySuggestionsDiv.innerHTML = '';
-                return;
-            }
-            searchResultsContainer.innerHTML = '<p>Searching...</p>';
-            searchResultsContainer.classList.remove('hidden');
-            fuzzySuggestionsDiv.innerHTML = '';
-            searchResultsCache = []; // Clear previous cache
+      function normalizeArabicText(text) {
+    // Remove Arabic diacritics (tashkeel, harakat)
+    return text.replace(/[\u0617-\u061A\u064B-\u065F]/g, '');
+}  
+       
+	   function performSearch() {
+    const query = normalizeArabicText(searchInput.value.trim().toLowerCase());
+    if (!query) {
+        searchResultsContainer.classList.add('hidden');
+        searchResultsContainer.innerHTML = '';
+        return;
+    }
 
-            const searchArabic = searchArabicCheckbox.checked;
-            const searchUrdu = searchUrduCheckbox.checked;
-            const searchSecondary = searchSecondaryCheckbox.checked && (localStorage.getItem('secondaryTranslationLoaded') === 'true');
+    const transaction = db.transaction([AYAH_STORE, SECONDARY_STORE], 'readonly');
+    const ayahStore = transaction.objectStore(AYAH_STORE);
+    const secondaryStore = transaction.objectStore(SECONDARY_STORE);
+    searchResultsContainer.innerHTML = '';
+    searchResultsCache = [];
 
-            const results = [];
-            const transaction = db.transaction([AYAH_STORE, SECONDARY_STORE], 'readonly');
-            const ayahStore = transaction.objectStore(AYAH_STORE);
-            const secondaryStore = transaction.objectStore(SECONDARY_STORE);
+    ayahStore.openCursor().onsuccess = function (event) {
+        const cursor = event.target.result;
+        if (cursor) {
+            const ayah = cursor.value;
+            let matches = false;
+            let matchedText = '';
 
-            // Iterate over all ayahs. For large datasets, this could be slow.
-            // An actual search index (e.g., using lunr.js or similar, if allowed) would be better.
-            const cursorReq = ayahStore.openCursor();
-            cursorReq.onsuccess = async (event) => {
-                const cursor = event.target.result;
-                if (cursor) {
-                    const ayahData = cursor.value;
-                    let matchFound = false;
-                    let matchedText = '';
-
-                    if (searchArabic && ayahData.arabic.toLowerCase().includes(query)) {
-                        matchFound = true;
-                        matchedText = ayahData.arabic;
-                    }
-                    if (!matchFound && searchUrdu && ayahData.urdu.toLowerCase().includes(query)) {
-                        matchFound = true;
-                        matchedText = ayahData.urdu;
-                    }
-                    
-                    if (!matchFound && searchSecondary) {
-                        const secTrans = await new Promise(resolve => {
-                            secondaryStore.get(ayahData.id).onsuccess = e => resolve(e.target.result);
-                        });
-                        if (secTrans && secTrans.translation.toLowerCase().includes(query)) {
-                            matchFound = true;
-                            matchedText = secTrans.translation;
-                        }
-                    }
-
-                    if (matchFound) {
-                        results.push({
-                            surah: ayahData.surah,
-                            ayah: ayahData.ayah,
-                            text: matchedText.substring(0, 150) + (matchedText.length > 150 ? '...' : '') // Snippet
-                        });
-                        searchResultsCache.push(ayahData); // Cache for highlighting
-                    }
-                    cursor.continue();
-                } else {
-                    // Cursor finished
-                    displaySearchResults(results, query);
+            if (searchArabicCheckbox.checked) {
+                const normalizedArabic = normalizeArabicText(ayah.arabic.toLowerCase());
+                if (normalizedArabic.includes(query)) {
+                    matches = true;
+                    matchedText += `Arabic: ${ayah.arabic}<br>`;
                 }
-            };
-            cursorReq.onerror = (event) => {
-                searchResultsContainer.innerHTML = '<p>Error during search.</p>';
-                console.error('[Search] Error opening cursor:', event.target.error);
-            };
+            }
+            if (searchUrduCheckbox.checked && ayah.urdu) {
+                if (ayah.urdu.toLowerCase().includes(query)) {
+                    matches = true;
+                    matchedText += `Urdu: ${ayah.urdu}<br>`;
+                }
+            }
+            if (matches) {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'search-result-item';
+                resultDiv.innerHTML = `<div class="ref">${ayah.surah}:${ayah.ayah}</div><div class="text">${matchedText}</div>`;
+                resultDiv.onclick = () => {
+                    currentSurah = ayah.surah;
+                    currentAyah = ayah.ayah;
+                    surahSelect.value = currentSurah;
+                    populateAyahSelector(currentSurah, currentAyah);
+                    ayahSelect.value = currentAyah;
+                    loadSurah(currentSurah, currentAyah);
+                    searchResultsContainer.classList.add('hidden');
+                };
+                searchResultsContainer.appendChild(resultDiv);
+                searchResultsCache.push({ surah: ayah.surah, ayah: ayah.ayah, query });
+            }
+            cursor.continue();
+        } else {
+            searchResultsContainer.classList.toggle('hidden', searchResultsContainer.children.length === 0);
         }
+    };
 
+    if (searchSecondaryCheckbox.checked) {
+        secondaryStore.openCursor().onsuccess = function (event) {
+            const cursor = event.target.result;
+            if (cursor) {
+                const trans = cursor.value;
+                if (trans.translation.toLowerCase().includes(query)) {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'search-result-item';
+                    resultDiv.innerHTML = `<div class="ref">${trans.surah}:${trans.ayah}</div><div class="text">Secondary: ${trans.translation}</div>`;
+                    resultDiv.onclick = () => {
+                        currentSurah = trans.surah;
+                        currentAyah = trans.ayah;
+                        surahSelect.value = currentSurah;
+                        populateAyahSelector(currentSurah, currentAyah);
+                        ayahSelect.value = currentAyah;
+                        loadSurah(currentSurah, currentAyah);
+                        searchResultsContainer.classList.add('hidden');
+                    };
+                    searchResultsContainer.appendChild(resultDiv);
+                    searchResultsCache.push({ surah: trans.surah, ayah: trans.ayah, query });
+                }
+                cursor.continue();
+            }
+        };
+    }
+}
+
+	   
         function displaySearchResults(results, query) {
             searchResultsContainer.innerHTML = '';
             if (results.length === 0) {
